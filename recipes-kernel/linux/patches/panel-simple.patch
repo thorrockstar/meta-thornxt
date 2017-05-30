@@ -1,7 +1,5 @@
-diff --git "a/C:\\Users\\rsc\\Downloads\\panel-simple - Kopie.c" "b/C:\\Users\\rsc\\Downloads\\panel-simple.c"
-index c4566ce..ea06dbe 100644
---- "a/C:\\Users\\rsc\\Downloads\\panel-simple - Kopie.c"	
-+++ "b/C:\\Users\\rsc\\Downloads\\panel-simple.c"
+--- a/drivers/gpu/drm/panel/panel-simple.c
++++ b/drivers/gpu/drm/panel/panel-simple.c
 @@ -1856,6 +1856,30 @@ static const struct panel_desc winstar_wf35ltiacd = {
  	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
  };
