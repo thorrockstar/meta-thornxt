@@ -1,0 +1,642 @@
+--- /dev/null	2016-08-06 01:05:55.506918855 +0200
++++ b/sound/soc/atmel/atmel_ssm2518.c	2016-08-16 21:13:09.224968464 +0200
+@@ -0,0 +1,639 @@
++/**
++ * atmel_ssm2518 - Atmel ASoC driver for Thor-NX-T boards with SSM2518 codec.
++ *
++ * Copyright (C) 2016 Thor Engineering
++ *
++ * Author: Roy Schneider <roy@thor.engineering>
++ *
++ * GPLv2 or later
++ */
++
++#include <linux/clk.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/of_device.h>
++
++#include <sound/soc.h>
++#include <sound/pcm_params.h>
++
++/* Include the peripherical driver by Analog Devices Inc. */
++
++#include "../codecs/ssm2518.h"
++
++/* Include the SSC driver by Atmel. */
++
++#include "atmel_ssc_dai.h"
++
++/* Main clock rate used on the Thor-NX-T board. */
++
++#define MCLK_RATE 12288000    /* Supported sample-rates are 8kHz, 12kHz, 16kHz, 24kHz, 32kHz, 48kHz, 96kHz */
++
++/**
++ * Global that holds the clock handle. */
++
++#define PCK0_RATE 0
++
++#if PCK0_RATE
++static struct clk *g_mclk;
++#endif // #if PCK0_RATE
++
++/**
++ * Info:
++ * Dynamic Audio Power Management (DAPM) is designed to allow portable Linux
++ * devices to use the minimum amount of power within the audio subsystem at all times. */
++
++/**
++ * Dynamic Audio Power Management (DAPM) Widget for speaker out - there is no more.
++ */
++
++static const struct snd_soc_dapm_widget atmel_asoc_ssm2518_dapm_widgets[] =
++{
++    SND_SOC_DAPM_SPK("Speaker Out", NULL),
++};
++
++/**
++ * Dynamic Audio Power Management (DAPM) Routes for left and right channel.
++ */
++
++static const struct snd_soc_dapm_route atmel_asoc_ssm2518_dapm_routes[] =
++{
++    { "Speaker Out", NULL, "OUTL" }, \
++    { "Speaker Out", NULL, "OUTR" },
++};
++
++/**
++ * Callback function called by the ALSA framework to set the hardware parameter
++ * This is called when the hardware parameter (hw_params) is set up by the application,
++ * that is, once when the buffer size, the period size, the format, etc. are defined for
++ * the pcm substream.
++ * Hardware setups should be done in this callback, including the allocation of buffers. 
++ *
++ * Note: Parameters to be initialized are retrieved by params_xxx() macros.
++ *
++ * @param substream  Pointer to the PCM stream desscription, representing the audio stream.
++ * @param params     Pointer to the hardware parameter/option description.
++ *
++ * @return  Callback must return 0 if successful, or a negative error number such as -EINVAL.
++ */
++
++static int atmel_asoc_ssm2518_hw_params(struct snd_pcm_substream *substream, \
++                                        struct snd_pcm_hw_params *params)
++{
++    struct snd_soc_pcm_runtime *rtd = substream->private_data;
++    struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
++    int ret;
++    unsigned int rate;
++    int cmr_div, period;
++
++    /*
++     * The SSC clock dividers depend on the sample rate.  The CMR.DIV
++     * field divides the system master clock MCK to drive the SSC TK
++     * signal which provides the codec BCLK.  The TCMR.PERIOD and
++     * RCMR.PERIOD fields further divide the BCLK signal to drive
++     * the SSC TF signal which provides the codec LRCLK clock.
++     *
++     * The dividers were determined manually, where a CMR.DIV
++     * value is chosen such that the resulting BCLK value is
++     * divisible, or almost divisible, by (2 * sample rate), and then
++     * the TCMR.PERIOD is BCLK / (2 * sample rate) - 1.
++     */
++
++    rate = params_rate(params);
++
++    switch (rate) {
++    case 8000:
++        cmr_div = 24;   /* BCLK = 66MHz/(2*24) ~= 1,375MHz */
++        period = 85;    /* LRC = BCLK/(2*(85+1)) ~= 7994Hz */
++        break;
++    case 16000:
++        cmr_div = 24;   /* BCLK = 66MHz/(2*24) ~= 1,375MHz */
++        period = 42;    /* LRC = BCLK/(2*(42+1)) ~= 15988Hz */
++        break;
++    case 32000:
++        cmr_div = 12;   /* BCLK = 66MHz/(2*12) ~= 2,750MHz */
++        period = 42;   /* LRC = BCLK/(2*(42+1)) ~= 31976Hz */
++        break;
++    case 48000:
++        cmr_div = 8;   /* BCLK = 66MHz/(2*8) ~= 4,125MHz */
++        period = 42;   /* LRC = BCLK/(2*(42+1)) ~= 47965Hz */
++        break;
++    case 11025:
++        cmr_div = 22;  /* BCLK = 66MHz/(2*22) ~= 1.500MHz */
++        period = 67;   /* LRC = BCLK/(2*(67+1)) ~= 11029Hz */
++        break;
++    case 22050:
++        cmr_div = 22;  /* BCLK = 66MHz/(2*22) ~= 1.500MHz */
++        period = 33;   /* LRC = BCLK/(2*(33+1)) = 22058Hz) */
++        break;
++    case 44100:
++        cmr_div = 22;  /* BCLK = 66MHz/(2*22) ~= 1.500MHz */
++        period = 16;   /* LRC = BCLK/(2*(16+1)) = 44117Hz */
++        break;
++    default:
++        printk(KERN_WARNING "unsupported rate %d\n", rate);
++        return -EINVAL;
++    }
++
++    //printk(KERN_ALERT "DEBUG: atmel_asoc_ssm2518_hw_params(cmr_div=%u, period=%u) passed %s %d\n",cmr_div, period, __FUNCTION__,__LINE__);
++
++    /* set the MCK divider for BCLK */
++    
++    ret = snd_soc_dai_set_clkdiv(cpu_dai, ATMEL_SSC_CMR_DIV, cmr_div);
++    
++    if (ret < 0)
++    {
++        printk(KERN_ALERT "DEBUG: snd_soc_dai_set_clkdiv(cpu_dai, AT91SSC_CMR_DIV) failed, passed %s %d\n",__FUNCTION__,__LINE__);
++        return ret;
++    }
++
++    /* set the BCLK divider for DACLRC */
++    
++    ret = snd_soc_dai_set_clkdiv(cpu_dai, ATMEL_SSC_TCMR_PERIOD, period);
++
++    if (ret < 0)
++    {
++        printk(KERN_ALERT "DEBUG: snd_soc_dai_set_clkdiv(cpu_dai, AT91SSC_TCMR_PERIOD) failed, passed %s %d\n",__FUNCTION__,__LINE__);
++        return ret;
++    }
++
++    return(0);
++}
++
++/**
++ * To configure the devices 'sysclk' the 'snd_soc_codec_set_sysclk()' function can be used.
++ * It needs to be called at least once before playback starts. The 'clk_id' parameter must
++ * always be 'SSM2518_SYSCLK' and the dir parameter must always be 'SND_SOC_CLOCK_IN'.
++ * The 'freq' can be set to any of the frequencies. [Lars-Peter Clausen, Atmel]
++ *
++ * @param rtd  Pointer to the runtime parameter of the current pcm-stream.
++ *
++ * @return  Return 0 if successful, or a negative error number such as -EINVAL.
++ */
++
++static int atmel_asoc_ssm2518_init(struct snd_soc_pcm_runtime *rtd)
++{
++    int ierr;
++
++    if (rtd)
++    {
++        /* Codec system clock is supplied by PCK0. */
++
++        ierr = snd_soc_codec_set_sysclk(rtd->codec, SSM2518_SYSCLK, SSM2518_SYSCLK_SRC_MCLK, MCLK_RATE, SND_SOC_CLOCK_IN);
++
++        if (ierr < 0)
++        {
++            printk(KERN_ALERT "DEBUG: snd_soc_codec_set_sysclk(rtd->codec, ...) failed, passed %s %d\n",__FUNCTION__,__LINE__);
++        }
++    }
++    else
++    {
++        ierr = -EINVAL;
++    }
++
++    return (ierr);
++}
++
++/**
++ * Structure that contains the pointers of the function to be exported,
++ * like startup/shutdown/hwparams/hwfree/prepare/trigger
++ */
++
++static struct snd_soc_ops atmel_asoc_ssm2518_ops =
++{
++    .hw_params = atmel_asoc_ssm2518_hw_params,
++};
++
++/**
++ * This structure is the link to the sound hardware (codec) chip.
++ */
++
++static struct snd_soc_dai_link atmel_asoc_ssm2518_dailink =
++{
++    .name = "ssm2518",                  /* Name */
++    .stream_name = "Playback",          /* Stream name */
++    .codec_dai_name = "ssm2518-hifi",   /* Codec name, see 'ssm2518.c'. */
++
++    /*
++     * I2S format, SSC provides BCLK and LRC clocks.
++     *
++     * The SSC transmit and receive clocks are generated
++     * from the MCK divider, and the BCLK signal
++     * is output on the SSC TK line.
++     */
++
++    .dai_fmt = SND_SOC_DAIFMT_I2S       /* I2S mode */
++             | SND_SOC_DAIFMT_NB_NF     /* Normal bit clock + frame */
++             | SND_SOC_DAIFMT_CBS_CFS,  /* Codec clk slave & frame slave */
++
++    .ops = &atmel_asoc_ssm2518_ops,     /* Pointer table for stream operations, see above. */
++    .init = atmel_asoc_ssm2518_init,    /* Pointer to the init-function, called before playback. */
++};
++
++/**
++ * The machine driver can contain codec and platform specific code. It registers
++ * the audio subsystem with the kernel as a platform device and is represented by
++ * the following structure.
++ */
++
++static struct snd_soc_card atmel_asoc_ssm2518_card =
++{
++    .name = "atmel_asoc_ssm2518",                   /* Sound card name */
++    .owner = THIS_MODULE,                           /* Module that owns this. */
++
++    .dai_link = &atmel_asoc_ssm2518_dailink,        /* CPU <--> Codec DAI links  */
++    .num_links = 1,                                 /* Count of links pointed to by dai_link */
++
++    /* Dynamic Audio Power Management (DAPM) widgets table. */
++
++    .dapm_widgets = atmel_asoc_ssm2518_dapm_widgets,
++    .num_dapm_widgets = ARRAY_SIZE(atmel_asoc_ssm2518_dapm_widgets),/* Count of links pointed to by dapm_widgets */
++
++    /* Dynamic Audio Power Management (DAPM) routing table. */
++
++    .dapm_routes = atmel_asoc_ssm2518_dapm_routes,
++    .num_dapm_routes = ARRAY_SIZE(atmel_asoc_ssm2518_dapm_routes),/* Count of links pointed to by dapm_routes */
++
++    /* A card is fully routed if the DAPM route table describes all connections on
++     * the board.
++     *
++     * When a card is fully routed, some operations can be automated by the ASoC
++     * core. The first, and currently only, such operation is described below, and
++     * implemented by this patch.
++     * 
++     * Codecs often have a large number of external pins, and not all of these pins
++     * will be connected on all board designs. Some machine drivers therefore call
++     * snd_soc_dapm_nc_pin() for all the unused pins, in order to tell the ASoC core
++     * never to activate them.
++     * 
++     * However, when a card is fully routed, the information needed to derive the
++     * set of unused pins is present in card->dapm_routes. In this case, have
++     * the ASoC core automatically call snd_soc_dapm_nc_pin() for each unused
++     * codec pin. */
++
++    .fully_routed = true,   /* Set the fully_routed flag in order to disable unused codec pins. */
++};
++
++/**
++ * Called from the 'probe' function to initialize the device.
++ *
++ * @param pdev  Pointer to the device structure. Platform devices are given a name, used in driver binding,
++ *              and a list of resources such as addresses and IRQs.
++ *
++ * @return  Callback must return 0 if successful, or a negative error number such as -EINVAL.
++ */
++
++static int atmel_asoc_ssm2518_dt_init(struct platform_device *pdev)
++{
++    struct device_node *np;
++    struct device_node *codec_np, *cpu_np;
++    struct snd_soc_card *card;
++    struct snd_soc_dai_link *dailink;
++    int ierr;
++
++    ierr = -EINVAL;
++
++    if (pdev)
++    {
++        np = pdev->dev.of_node;
++
++        if (np)
++        {
++            /* The machine driver can contain codec and platform specific code. It registers
++             * the audio subsystem with the kernel as a platform device and is represented by
++             * the following structure. */
++
++            card = &atmel_asoc_ssm2518_card;
++
++            /* This structure is the link to the sound hardware (codec) chip. */
++
++            dailink = &atmel_asoc_ssm2518_dailink;
++
++            /* Parse DT data for the model name. */
++
++            ierr = snd_soc_of_parse_card_name(card, "atmel,model");
++
++            if (ierr)
++            {
++                dev_err(&pdev->dev, "Failed to parse card name.\n");
++            }
++            else
++            {
++                /* Parse DT data for the routing. */
++
++                ierr = snd_soc_of_parse_audio_routing(card, "atmel,audio-routing");
++
++                if (ierr)
++                {
++                    dev_err(&pdev->dev, "Failed to parse audio routing.\n");
++                }
++                else
++                {
++                    /* Parse DT data for the used SCC-controller. */
++
++                    cpu_np = of_parse_phandle(np, "atmel,ssc-controller", 0);
++
++                    if (!cpu_np)
++                    {
++                       dev_err(&pdev->dev, "Failed to get dai and pcm info.\n");
++
++                        ierr = -EINVAL;
++                    }
++                    else
++                    {
++                        /* Add the pointer to the used SCC-controller to the dailink structure. */
++
++                        dailink->cpu_of_node = cpu_np;
++                        dailink->platform_of_node = cpu_np;
++
++                        /* The function 'of_node_put()' needs to be called when the device node which
++                         * is got from of_parse_phandle has finished using. */
++
++                        of_node_put(cpu_np);
++
++                        /* Parse DT data for the used SCC-controller. */
++
++                        codec_np = of_parse_phandle(np, "atmel,audio-codec", 0);
++
++                        if (!codec_np)
++                        {
++                            dev_err(&pdev->dev, "Failed to get codec info.\n");
++
++                            ierr = -EINVAL;
++                        }
++                        else
++                        {
++                            /* Add the pointer to the used audio-codec to the dailink structure. */
++
++                            dailink->codec_of_node = codec_np;
++
++                            /* The function 'of_node_put()' needs to be called when the device node which
++                             * is got from 'of_parse_phandle()' has finished using. */
++
++                            of_node_put(codec_np);
++
++                            /* OK */
++
++                            dev_info(&pdev->dev, "atmel_asoc_ssm2518_dt_init() OK\n");
++                            
++                            ierr = 0;
++                        }
++                    }
++                }
++            }
++        }
++        else
++        {
++            dev_err(&pdev->dev, "Only device tree (dts) mode is supported.\n");
++        }
++    }
++
++    return (ierr);
++}
++
++/**
++ * Note that probe() should in general verify that the specified device hardware
++ * actually exists; sometimes platform setup code can't be sure. The probing
++ * can use device resources, including clocks, and device platform_data.
++ *
++ * @param pdev  Pointer to the structure that describes the device.
++ *
++ * @return  Function must return 0 if successful, or a negative error number such as -EINVAL.
++ */
++
++static int atmel_asoc_ssm2518_probe(struct platform_device *pdev)
++{
++    struct snd_soc_card *card;
++    struct snd_soc_dai_link *dailink;
++    int id, ierr;
++
++    ierr = -EINVAL;
++
++    if (pdev)
++    {
++        /* The machine driver can contain codec and platform specific code. It registers
++         * the audio subsystem with the kernel as a platform device and is represented by
++         * the following structure. */
++
++        card = &atmel_asoc_ssm2518_card;
++
++        /* This structure is the link to the sound hardware (codec) chip. */
++
++        dailink = &atmel_asoc_ssm2518_dailink;
++
++        /* Add the pointer to the device into the card structure. */
++
++        card->dev = &pdev->dev;
++
++        /* Call the initialize function, that will also setup SCC timing. */
++
++        ierr = atmel_asoc_ssm2518_dt_init(pdev);
++
++        if (ierr)
++        {
++            dev_err(&pdev->dev, "Failed to init device tree info.\n");
++        }
++        else
++        {
++            /* Check if using the first, the second or the... SCC controller. */
++
++            id = of_alias_get_id((struct device_node *)dailink->cpu_of_node, "ssc");
++
++            /* Set the used SCC controller for audio. */
++
++            ierr = atmel_ssc_set_audio(id);
++
++            if (ierr)
++            {
++                dev_err(&pdev->dev, "Failed to set SSC %d for audio.\n", id);
++            }
++            else
++            {
++
++#if PCK0_RATE
++
++                /* Open the peripherical clock 0 connected to the SSC2518. */
++
++                g_mclk = devm_clk_get(&pdev->dev, "mclk");
++
++                if (IS_ERR(g_mclk))
++                {
++                    dev_err(&pdev->dev, "Failed to get 'mclk'.\n");
++
++                    ierr = PTR_ERR(g_mclk);
++                }
++                else
++                {
++                    /* Prepare the 'main' clock. */
++
++                    if (clk_set_rate(g_mclk, PCK0_RATE))
++                    {
++                        dev_warn(&pdev->dev, "Failed to set clock rate 'mclk for SSM2518 to %dHz.\n", PCK0_RATE);
++                    }
++
++                    ierr = clk_prepare_enable(g_mclk);
++
++                    if (ierr)
++                    {
++                        dev_err(&pdev->dev, "Failed to enable clock 'mclk'.\n");
++                    }
++                }
++
++#else // #if PCK0_RATE
++
++                ierr = 0;
++
++#endif // #else #if PCK0_RATE
++
++                if (ierr)
++                {
++                    /* The function 'of_node_put()' needs to be called when the device node which
++                     * is got from of_parse_phandle has finished using. */
++
++                    atmel_ssc_put_audio(id);
++                }
++                else
++                {
++                    /* Register the card with the ASoC core  */
++
++                    dev_info(&pdev->dev, "snd_soc_register_card()\n");
++
++                    ierr = snd_soc_register_card(card);
++
++                    if (ierr)
++                    {
++                        dev_err(&pdev->dev, "snd_soc_register_card failed, error %d.\n", ierr);
++
++                        /* The function 'of_node_put()' needs to be called when the device node which
++                         * is got from 'of_alias_get_id()' has finished using. */
++
++                        atmel_ssc_put_audio(id);
++                    }
++                }
++            }
++        }
++    }
++
++    dev_info(&pdev->dev, "Registered sound card %s\n", ierr ? "ERROR" : "OK");
++
++    return (ierr);
++}
++
++/**
++ * Remove the device (sound card) from the system.
++ *
++ * @param pdev  Pointer to the structure that describes the device.
++ *
++ * @return  Function must return 0 if successful, or a negative error number such as -EINVAL.
++ */
++
++static int atmel_asoc_ssm2518_remove(struct platform_device *pdev)
++{
++    struct snd_soc_card *card;
++    struct snd_soc_dai_link *dailink;
++    int id;
++    int ierr;
++
++    ierr = -EINVAL;
++
++    if (pdev)
++    {
++        /* The machine driver can contain codec and platform specific code. It registers
++         * the audio subsystem with the kernel as a platform device and is represented by
++         * the following structure. */
++
++        card = &atmel_asoc_ssm2518_card;
++
++        /* This structure is the link to the sound hardware (codec) chip. */
++
++        dailink = &atmel_asoc_ssm2518_dailink;
++
++        /* Check if using the first, the second or the... SCC controller. */
++
++        if (dailink->cpu_of_node)
++        {
++            id = of_alias_get_id((struct device_node *)dailink->cpu_of_node, "ssc");
++
++            /* Unregister a card with the ASoC core. */
++
++            snd_soc_unregister_card(card);
++
++            /* The function 'of_node_put()' needs to be called when the device node which
++             * is got from of_alias_get_id has finished using. */
++
++            atmel_ssc_put_audio(id);
++
++            /* OK */
++
++            ierr = 0;
++        }
++
++        /* Unprepare clock. */
++
++#if PCK0_RATE
++
++        if (g_mclk)
++        {
++            clk_disable_unprepare(g_mclk);
++        }
++
++#endif // #if PCK0_RATE
++
++    }
++
++    return (ierr);
++}
++
++/**
++ * Device names appearing in the device tree (in the "compatible" property) tend to
++ * take a standardized form which does not necessarily match the name given to the driver
++ * in the Linux kernel. The kernel provides an of_device_id structure which can be used
++ * for this purpose:
++ */
++
++#ifdef CONFIG_OF
++
++static const struct of_device_id atmel_asoc_ssm2518_dt_ids[] =
++{
++    { .compatible = "atmel,asoc-ssm2518", },
++    { }
++};
++
++#endif /* #ifdef CONFIG_OF */
++
++/**
++ * Platform drivers follow the standard driver model convention, where
++ * discovery/enumeration is handled outside the drivers, and drivers
++ * provide probe() and remove() methods.  They support power management
++ * and shutdown notifications using the standard conventions.
++ */
++
++static struct platform_driver atmel_asoc_ssm2518_driver =
++{
++    .driver =
++    {
++        .name = "atmel-ssm2518-audio",
++        .of_match_table = of_match_ptr(atmel_asoc_ssm2518_dt_ids),
++    },
++
++    /* Probe/Remove function */
++
++    .probe = atmel_asoc_ssm2518_probe,
++    .remove = atmel_asoc_ssm2518_remove,
++};
++
++/* Note from 'platform_device.h':
++ * 
++ * Helper macro for drivers that don't do anything
++ * special in module init/exit.  This eliminates a lot of
++ * boilerplate.  Each module may only use this macro once, and
++ * calling it replaces module_init() and module_exit(). */
++
++module_platform_driver(atmel_asoc_ssm2518_driver);
++
++/* Module information */
++
++MODULE_AUTHOR("Roy Schneider <roy@thor.engineering>");
++MODULE_DESCRIPTION("ALSA SoC machine driver for Thor NX-T boards with SSM2518 codec.");
++MODULE_LICENSE("GPL");
++
++/* atmel_ssm2518.c */

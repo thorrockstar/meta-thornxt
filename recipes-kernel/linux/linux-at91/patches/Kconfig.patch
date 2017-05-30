@@ -1,0 +1,20 @@
+--- a/sound/soc/atmel/Kconfig	2016-08-06 00:13:52.275443000 +0200
++++ b/sound/soc/atmel/Kconfig	2016-08-14 13:14:34.470999547 +0200
+@@ -45,6 +45,17 @@
+ 	  Say Y if you want to add support for Atmel ASoC driver for boards using
+ 	  WM8904 codec.
+ 
++config SND_ATMEL_SOC_SSM2518
++	tristate "Atmel ASoC driver for boards using SSM2518 codec"
++	depends on ARCH_AT91 || COMPILE_TEST
++	depends on ATMEL_SSC && SND_ATMEL_SOC && I2C
++	select SND_ATMEL_SOC_SSC
++	select SND_ATMEL_SOC_DMA
++	select SND_SOC_SSM2518
++	help
++	  Say Y if you want to add support for Atmel ASoC driver for boards using
++	  SSM2518 codec.
++
+ config SND_AT91_SOC_SAM9X5_WM8731
+ 	tristate "SoC Audio support for WM8731-based at91sam9x5 board"
+ 	depends on ARCH_AT91 || COMPILE_TEST

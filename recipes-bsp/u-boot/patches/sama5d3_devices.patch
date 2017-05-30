@@ -1,0 +1,125 @@
+--- a/arch/arm/cpu/armv7/at91/sama5d3_devices.c	2016-08-01 12:11:46.946123304 +0200
++++ b/arch/arm/cpu/armv7/at91/sama5d3_devices.c	2016-08-01 10:13:41.406029000 +0200
+@@ -11,6 +11,7 @@
+ #include <asm/arch/clk.h>
+ #include <asm/arch/gpio.h>
+ #include <asm/io.h>
++#include <spi.h>
+ 
+ unsigned int has_emac()
+ {
+@@ -105,6 +106,114 @@
+ 	/* Enable clock */
+ 	at91_periph_clk_enable(ATMEL_ID_SPI0);
+ }
++
++void at91_spi1_hw_init(unsigned long cs_mask)
++{
++    at91_set_a_periph(AT91_PIO_PORTC, 22, 0);       /* SPI1_MISO */
++    at91_set_a_periph(AT91_PIO_PORTC, 23, 0);       /* SPI1_MOSI */
++    at91_set_a_periph(AT91_PIO_PORTC, 24, 0);       /* SPI1_SPCK */
++
++    if (cs_mask & (1 << 0))
++            at91_set_pio_output(AT91_PIO_PORTC, 25, 1); /* SPI1_CS0 */
++
++    if (cs_mask & (1 << 1))
++            at91_set_pio_output(AT91_PIO_PORTC, 26, 1); /* SPI1_CS1 */
++
++    if (cs_mask & (1 << 2))
++            at91_set_pio_output(AT91_PIO_PORTC, 27, 1); /* SPI1_CS2 */
++
++    if (cs_mask & (1 << 3))
++            at91_set_pio_output(AT91_PIO_PORTC, 28, 1); /* SPI1_CS3 */
++
++    /* Enable clock */
++    at91_periph_clk_enable(ATMEL_ID_SPI1);
++}
++
++/* Function needed by the SPI skeleton for validating the chip select. */
++
++int spi_cs_is_valid(unsigned int bus, unsigned int cs)
++{
++    return ((bus <= 1) && (cs < 4));
++}
++
++void spi_cs_activate(struct spi_slave *slave)
++{
++        switch(slave->bus)
++        {
++            case 0: // SPI0
++		switch (slave->cs) {
++		case 0:
++			at91_set_pio_output(AT91_PIO_PORTD, 13, 0);
++		case 1:
++			at91_set_pio_output(AT91_PIO_PORTD, 14, 0);
++		case 2:
++			at91_set_pio_output(AT91_PIO_PORTD, 15, 0);
++		case 3:
++			at91_set_pio_output(AT91_PIO_PORTD, 16, 0);
++		default:
++			break;
++		}
++	    break;
++
++            case 1: // SPI1
++		switch (slave->cs) {
++		case 0:
++			at91_set_pio_output(AT91_PIO_PORTC, 25, 0);
++		case 1:
++			at91_set_pio_output(AT91_PIO_PORTC, 26, 0);
++		case 2:
++			at91_set_pio_output(AT91_PIO_PORTC, 27, 0);
++		case 3:
++			at91_set_pio_output(AT91_PIO_PORTC, 28, 0);
++		default:
++			break;
++		}
++	    break;
++
++	    default:
++            break;
++        }
++}
++
++void spi_cs_deactivate(struct spi_slave *slave)
++{
++        switch(slave->bus)
++        {
++            case 0: // SPI0
++		switch (slave->cs) {
++		case 0:
++			at91_set_pio_output(AT91_PIO_PORTD, 13, 1);
++		case 1:
++			at91_set_pio_output(AT91_PIO_PORTD, 14, 1);
++		case 2:
++			at91_set_pio_output(AT91_PIO_PORTD, 15, 1);
++		case 3:
++			at91_set_pio_output(AT91_PIO_PORTD, 16, 1);
++		default:
++			break;
++		}
++	    break;
++
++            case 1: // SPI1
++		switch (slave->cs) {
++		case 0:
++			at91_set_pio_output(AT91_PIO_PORTC, 25, 1);
++		case 1:
++			at91_set_pio_output(AT91_PIO_PORTC, 26, 1);
++		case 2:
++			at91_set_pio_output(AT91_PIO_PORTC, 27, 1);
++		case 3:
++			at91_set_pio_output(AT91_PIO_PORTC, 28, 1);
++		default:
++			break;
++		}
++	    break;
++
++	    default:
++            break;
++        }
++}
++
+ #endif
+ 
+ #ifdef CONFIG_GENERIC_ATMEL_MCI

@@ -1,0 +1,28 @@
+--- a/common/lcd.c	2016-08-21 21:27:43.790637462 +0200
++++ b/common/lcd.c	2016-08-29 16:54:09.314907771 +0200
+@@ -129,7 +129,7 @@
+ static short console_row;
+ 
+ static void *lcd_console_address;
+-static void *lcd_base;			/* Start of framebuffer memory	*/
++void *lcd_base;			/* Start of framebuffer memory	*/
+ 
+ static char lcd_flush_dcache;	/* 1 to flush dcache after each lcd update */
+ 
+@@ -438,6 +438,8 @@
+ 
+ 	lcd_init(lcd_base);		/* LCD initialization */
+ 
++	return 0;
++#if 0
+ 	/* Device initialization */
+ 	memset(&lcddev, 0, sizeof(lcddev));
+ 
+@@ -450,6 +452,7 @@
+ 	rc = stdio_register(&lcddev);
+ 
+ 	return (rc == 0) ? 1 : rc;
++#endif
+ }
+ 
+ /*----------------------------------------------------------------------*/

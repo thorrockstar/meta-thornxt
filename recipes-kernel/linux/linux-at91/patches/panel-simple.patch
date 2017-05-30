@@ -1,0 +1,45 @@
+diff --git "a/C:\\Users\\rsc\\Downloads\\panel-simple - Kopie.c" "b/C:\\Users\\rsc\\Downloads\\panel-simple.c"
+index c4566ce..ea06dbe 100644
+--- "a/C:\\Users\\rsc\\Downloads\\panel-simple - Kopie.c"	
++++ "b/C:\\Users\\rsc\\Downloads\\panel-simple.c"
+@@ -1856,6 +1856,30 @@ static const struct panel_desc winstar_wf35ltiacd = {
+ 	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+ };
+ 
++static const struct drm_display_mode eastrising_ertft050_mode = {
++	.clock = 33333,
++	.hdisplay = 800,
++	.hsync_start = 800 + 40,
++	.hsync_end = 800 + 40 + 48,
++	.htotal = 800 + 40 + 48 + 40,
++	.vdisplay = 480,
++	.vsync_start = 480 + 13,
++	.vsync_end = 480 + 13 + 3,
++	.vtotal = 480 + 13 + 3 + 29,
++	.vrefresh = 60,
++	.flags = DRM_MODE_FLAG_NVSYNC | DRM_MODE_FLAG_NHSYNC,
++};
++
++static const struct panel_desc eastrising_ertft050 = {
++	.modes = &eastrising_ertft050_mode,
++	.num_modes = 1,
++	.size = {
++		.width = 110,
++		.height = 78,
++	},
++	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
++};
++
+ static const struct of_device_id platform_of_match[] = {
+ 	{
+ 		.compatible = "ampire,am-480272h3tmqw-t01h",
+@@ -2017,6 +2041,9 @@ static const struct of_device_id platform_of_match[] = {
+ 		.compatible = "shelly,sca07010-bfn-lnn",
+ 		.data = &shelly_sca07010_bfn_lnn,
+ 	}, {
++		.compatible = "eastrising,ertft050",
++		.data = &eastrising_ertft050,
++	}, {
+ 		.compatible = "starry,kr122ea0sra",
+ 		.data = &starry_kr122ea0sra,
+ 	}, {
