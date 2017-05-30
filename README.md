@@ -19,9 +19,9 @@ Supported SoCs / MACHINE names
 Sources
 =======
 - meta-thornxt
-URI: git://github.com/thorrockstar/linux4thornxt.git
-URI: https://github.com/thorrockstar/linux4thornxt.git
-URI: ssh://git@github.com:thorrockstar/linux4thornxt.git
+URI: git://github.com/thorrockstar/meta-thornxt.git
+URI: https://github.com/thorrockstar/meta-thornxt.git
+URI: ssh://git@github.com:thorrockstar/meta-thornxt.git
 Branch: morty
 
 
@@ -68,7 +68,7 @@ git clone git://github.com/linux4sam/meta-atmel.git
 
 5/ Clone meta-thornxt layer with the proper branch ready.
    Keep in mind that you need a private key for this repository.
-git clone git@github.com:thorrockstar/linux4thornxt.git
+git clone git@github.com:thorrockstar/meta-thornxt.git
 
 6/ Enter the poky directory to configure the build system and start the build process
 cd poky
@@ -96,8 +96,8 @@ BBLAYERS ?= " \
   ${BSPDIR}/meta-thornxt \
   ${BSPDIR}/meta-openembedded/meta-oe \
   ${BSPDIR}/meta-openembedded/meta-networking \
-  # Needed only for SDK building!
-  ${BSPDIR}/sources/meta-qt5 \
+  ${BSPDIR}/meta-openembedded/meta-python \
+  ${BSPDIR}/meta-qt5 \
   "
 
 BLAYERS_NON_REMOVABLE ?= " \
@@ -121,7 +121,7 @@ USER_CLASSES ?= "buildstats image-mklibs"
 
 To get better performance, use the "poky-atmel" distribution by also adding that
 line:
-DISTRO = "poky-atmel"
+DISTRO ?= "poky-atmel"
 
 9/ Build Thor demo images
 bitbake atmel-xplained-demo-image
