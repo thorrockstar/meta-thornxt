@@ -5,6 +5,7 @@ IMAGE_INSTALL_remove = "\
 	lmbench \
 	atmel-wireless-firmware \
 	dtc \
+	iperf \
 	dtc-misc \
 	python-pyserial \
 	python-smbus \
