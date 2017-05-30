@@ -97,7 +97,7 @@ BBLAYERS ?= " \
   ${BSPDIR}/meta-openembedded/meta-oe \
   ${BSPDIR}/meta-openembedded/meta-networking \
   ${BSPDIR}/meta-openembedded/meta-python \
-  ${BSPDIR}/sources/meta-qt5 \
+  ${BSPDIR}/meta-qt5 \
   "
 
 BLAYERS_NON_REMOVABLE ?= " \
