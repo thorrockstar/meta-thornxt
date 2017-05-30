@@ -1,5 +1,5 @@
---- a/include/configs/sama5d3_xplained.h	2016-08-01 12:11:47.838123316 +0200
-+++ b/include/configs/sama5d3_xplained.h	2016-08-01 11:45:14.754102000 +0200
+--- a/include/configs/sama5d3_xplained.h
++++ b/include/configs/sama5d3_xplained.h
 @@ -4,6 +4,8 @@
   * Copyright (C) 2014 Atmel Corporation
   *		      Bo Shen <voice.shen@atmel.com>
@@ -9,7 +9,7 @@
   * SPDX-License-Identifier:	GPL-2.0+
   */
  
-@@ -32,6 +34,14 @@
+@@ -43,6 +45,15 @@
  	(CONFIG_SYS_SDRAM_BASE + 4 * 1024 - GENERATED_GBL_DATA_SIZE)
  #endif
  
@@ -21,24 +21,25 @@
 +#define LCD_BPP LCD_COLOR16
 +#define LCD_OUTPUT_BPP 24
 +#define CONFIG_SYS_WHITE_ON_BLACK
++
  /* NAND flash */
  #define CONFIG_CMD_NAND
  
-@@ -90,7 +89,7 @@
- #define CONFIG_AT24MAC_ADDR1		0x59
+@@ -81,7 +92,7 @@
+ #define CONFIG_PHYLIB
  
  /* MMC */
 -#define CONFIG_CMD_MMC
-+/*#define CONFIG_CMD_MMC*/
++//#define CONFIG_CMD_MMC
  
  #ifdef CONFIG_CMD_MMC
  #define CONFIG_MMC
-@@ -100,7 +99,7 @@
+@@ -91,7 +102,7 @@
  #endif
  
  /* USB */
 -#define CONFIG_CMD_USB
-+/*#define CONFIG_CMD_USB*/
++//#define CONFIG_CMD_USB
  
  #ifdef CONFIG_CMD_USB
- #define CONFIG_USB_EHCI
+ #define CONFIG_USB_ATMEL

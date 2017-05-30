@@ -5,7 +5,6 @@ SRC_URI += " \
 	file://spidev.patch;patch=1 \
 	file://at91_can.patch;patch=1 \
 	file://atmel_ssm2518.patch;patch=1 \
-	file://ssm2518.patch;patch=1 \
 	file://Kconfig.patch;patch=1 \
 	file://Makefile.patch;patch=1 \
 	file://panel-simple.patch;patch=1 \

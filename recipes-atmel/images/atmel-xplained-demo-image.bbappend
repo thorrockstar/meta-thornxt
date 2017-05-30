@@ -3,9 +3,9 @@ IMAGE_INSTALL_remove = "\
 	mpg123 \
 	packagegroup-core-full-cmdline \
 	lmbench \
+	iperf \
 	atmel-wireless-firmware \
 	dtc \
-	iperf \
 	dtc-misc \
 	python-pyserial \
 	python-smbus \

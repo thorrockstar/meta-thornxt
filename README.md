@@ -121,7 +121,7 @@ USER_CLASSES ?= "buildstats image-mklibs"
 
 To get better performance, use the "poky-atmel" distribution by also adding that
 line:
-DISTRO ?= "poky-atmel"
+DISTRO = "poky-atmel"
 
 9/ Build Thor demo images
 bitbake atmel-xplained-demo-image
