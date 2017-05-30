@@ -1,5 +1,5 @@
---- a/arch/arm/cpu/armv7/at91/sama5d3_devices.c	2016-08-01 12:11:46.946123304 +0200
-+++ b/arch/arm/cpu/armv7/at91/sama5d3_devices.c	2016-08-01 10:13:41.406029000 +0200
+--- a/arch/arm/mach-at91/armv7/sama5d3_devices.c	2016-08-01 12:11:46.946123304 +0200
++++ b/arch/arm/mach-at91/armv7/sama5d3_devices.c	2016-08-01 10:13:41.406029000 +0200
 @@ -11,6 +11,7 @@
  #include <asm/arch/clk.h>
  #include <asm/arch/gpio.h>
