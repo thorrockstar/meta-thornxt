@@ -19,9 +19,9 @@ Supported SoCs / MACHINE names
 Sources
 =======
 - meta-thornxt
-URI: git://github.com/thorrockstar/linux4thornxt.git
-URI: https://github.com/thorrockstar/linux4thornxt.git
-URI: ssh://git@github.com:thorrockstar/linux4thornxt.git
+URI: git://github.com/thorrockstar/meta-thornxt.git
+URI: https://github.com/thorrockstar/meta-thornxt.git
+URI: ssh://git@github.com:thorrockstar/meta-thornxt.git
 Branch: morty
 
 
@@ -68,7 +68,7 @@ git clone git://github.com/linux4sam/meta-atmel.git
 
 5/ Clone meta-thornxt layer with the proper branch ready.
    Keep in mind that you need a private key for this repository.
-git clone git@github.com:thorrockstar/linux4thornxt.git
+git clone git@github.com:thorrockstar/meta-thornxt.git
 
 6/ Enter the poky directory to configure the build system and start the build process
 cd poky
@@ -96,7 +96,7 @@ BBLAYERS ?= " \
   ${BSPDIR}/meta-thornxt \
   ${BSPDIR}/meta-openembedded/meta-oe \
   ${BSPDIR}/meta-openembedded/meta-networking \
-  # Needed only for SDK building!
+  ${BSPDIR}/meta-openembedded/meta-python \
   ${BSPDIR}/sources/meta-qt5 \
   "
 
