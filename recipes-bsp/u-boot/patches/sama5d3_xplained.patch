@@ -1,7 +1,5 @@
-diff --git "a/D:\\TEMP\\TEST\\git\\board\\atmel\\sama5d3_xplained\\sama5d3_xplained - Kopie.c" "b/D:\\TEMP\\TEST\\git\\board\\atmel\\sama5d3_xplained\\sama5d3_xplained.c"
-index 2b9da91..176c2f7 100644
---- "a/D:\\TEMP\\TEST\\git\\board\\atmel\\sama5d3_xplained\\sama5d3_xplained - Kopie.c"	
-+++ "b/D:\\TEMP\\TEST\\git\\board\\atmel\\sama5d3_xplained\\sama5d3_xplained.c"
+--- a/board/atmel/sama5d3_xplained/sama5d3_xplained.c
++++ b/board/atmel/sama5d3_xplained/sama5d3_xplained.c
 @@ -17,11 +17,4292 @@
  #include <net.h>
  #include <netdev.h>
