@@ -5,7 +5,7 @@ do_install_append() {
 	rm -f -r ${D}/lib/firmware/bnx2
 	rm -f -r ${D}/lib/firmware/bnx2x
 	rm -f -r ${D}/lib/firmware/ueagle-atm
-	rm -f -r ${D}/lib/firmware/brcm/*-pcie.*
+	rm -f -r ${D}/lib/firmware/brcm
 	rm -f -r ${D}/lib/firmware/amdgpu
 	rm -f -r ${D}/lib/firmware/sb16
 	rm -f -r ${D}/lib/firmware/moxa
