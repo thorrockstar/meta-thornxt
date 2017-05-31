@@ -30,7 +30,7 @@
  
  /* MMC */
 -#define CONFIG_CMD_MMC
-+//#define CONFIG_CMD_MMC
++/*#define CONFIG_CMD_MMC*/
  
  #ifdef CONFIG_CMD_MMC
  #define CONFIG_MMC
@@ -39,7 +39,7 @@
  
  /* USB */
 -#define CONFIG_CMD_USB
-+//#define CONFIG_CMD_USB
++/*#define CONFIG_CMD_USB*/
  
  #ifdef CONFIG_CMD_USB
  #define CONFIG_USB_ATMEL
