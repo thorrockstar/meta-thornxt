@@ -4,9 +4,9 @@
  #include <net.h>
  #include <netdev.h>
  #include <spl.h>
++#include <configs/sama5d3_xplained.h>
 +#include <spi.h>
-+#include <atmel_lcd.h>
-+
++#include <lcd.h>
 +#include <atmel_hlcdc.h>
  #include <asm/arch/atmel_mpddrc.h>
  #include <asm/arch/at91_wdt.h>
