@@ -13,10 +13,12 @@ IMAGE_INSTALL_remove = "\
 	python-pip \
 	python-distribute \
 	python-pycurl \	
+	linux-firmware \
 	"
 
 # add important components to image
 IMAGE_INSTALL_append = "\
 	glibc \
 	glib-2.0 \
+	linux-firmware-iwlwifi \
 	"
