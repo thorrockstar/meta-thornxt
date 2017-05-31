@@ -129,25 +129,24 @@ bitbake atmel-xplained-demo-image
 Typical bitbake output
 ======================
 Build Configuration:
-BB_VERSION        = "1.34.0"
+BB_VERSION        = "1.32.0"
 BUILD_SYS         = "i686-linux"
-NATIVELSBSTRING   = "universal"
+NATIVELSBSTRING   = "Ubuntu-16.04"
 TARGET_SYS        = "arm-poky-linux-gnueabi"
 MACHINE           = "sama5d3-xplained"
-DISTRO            = "poky-atmel"
-DISTRO_VERSION    = "2.3"
-TUNE_FEATURES     = "arm armv7a vfp thumb callconvention-hard cortexa5"
+DISTRO            = "poky"
+DISTRO_VERSION    = "2.2.2"
+TUNE_FEATURES     = "arm armv7a vfp thumb            callconvention-hard            cortexa5"
 TARGET_FPU        = "hard"
 meta              
 meta-poky         
-meta-yocto-bsp    = "morty:bd063fa288b49b6e3ea77982d0ccc46610feb1ad"
-meta-atmel        = "morty:41cffff1bd4cc0e553b5b4a170cdbec9dec18443"
-meta-thornxt      = "morty:bb4a0e1cb51ce127b04db7bc8ad973e2cca9e672"
+meta-yocto-bsp    = "morty:d05941ae4567def4a288894717e5f550da246107"
+meta-atmel        = "morty:8c79606d3e73179506a6bbc40406f2c3aa9bf40e"
+meta-thornxt      = "morty:02ed0b534093c19e32b0f9d5e74eb657bdfee557"
 meta-oe           
 meta-networking   
-meta-python       = "morty:b063789560bfb9c60a7a15277b5b3a9839b5ba74"
-meta-qt5          = "morty:6605c48f3a900da26425ef31d83eb1c95d551531"
-
+meta-python       = "morty:fe5c83312de11e80b85680ef237f8acb04b4b26e"
+meta-qt5          = "morty:3601fd2c5306ac6d5d0d536e0be8cbb90da9b4c1"
 
 Contributing
 ============
