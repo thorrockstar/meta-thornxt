@@ -9,7 +9,32 @@
  static char lcd_flush_dcache;	/* 1 to flush dcache after each lcd update */
  
  /* Flush LCD activity to the caches */
-@@ -155,6 +155,8 @@ int drv_lcd_init(void)
+@@ -76,6 +76,7 @@ void lcd_set_flush_dcache(int flush)
+ 	lcd_flush_dcache = (flush != 0);
+ }
+ 
++#if 0
+ static void lcd_stub_putc(struct stdio_dev *dev, const char c)
+ {
+ 	lcd_putc(c);
+@@ -85,6 +86,7 @@ static void lcd_stub_puts(struct stdio_dev *dev, const char *s)
+ {
+ 	lcd_puts(s);
+ }
++#endif
+ 
+ /* Small utility to check that you got the colours right */
+ #ifdef LCD_TEST_PATTERN
+@@ -148,13 +150,17 @@ __weak int lcd_get_size(int *line_length)
+ 
+ int drv_lcd_init(void)
+ {
++#if 0
+ 	struct stdio_dev lcddev;
+ 	int rc;
++#endif
+ 
+ 	lcd_base = map_sysmem(gd->fb_base, 0);
  
  	lcd_init(lcd_base);
  
@@ -18,7 +43,7 @@
  	/* Device initialization */
  	memset(&lcddev, 0, sizeof(lcddev));
  
-@@ -167,6 +169,7 @@ int drv_lcd_init(void)
+@@ -167,6 +173,7 @@ int drv_lcd_init(void)
  	rc = stdio_register(&lcddev);
  
  	return (rc == 0) ? 1 : rc;
