@@ -51,24 +51,24 @@ Build procedure
 ===============
 
 0/ Create a directory
-mkdir morty_poky
-cd morty_poky
+mkdir my_dir
+cd my_dir
 
 1/ Clone yocto/poky git repository with the proper branch ready.
-git clone git://git.yoctoproject.org/poky -b morty
+git clone git://git.yoctoproject.org/poky
 
 2/ Clone meta-openembedded git repository with the proper branch ready.
-git clone git://git.openembedded.org/meta-openembedded -b morty
+git clone git://git.openembedded.org/meta-openembedded
 
 3/ Clone meta-qt5 git repository with the proper branch ready
-git clone git://github.com/meta-qt5/meta-qt5.git -b morty
+git clone git://github.com/meta-qt5/meta-qt5.git
 
 4/ Clone meta-atmel layer with the proper branch ready.
-git clone git://github.com/linux4sam/meta-atmel.git -b morty
+git clone git://github.com/linux4sam/meta-atmel.git
 
 5/ Clone meta-thornxt layer with the proper branch ready.
    Keep in mind that you need a private key for this repository.
-git clone git@github.com:thorrockstar/meta-thornxt.git -b morty
+git clone git@github.com:thorrockstar/meta-thornxt.git
 
 6/ Enter the poky directory to configure the build system and start the build process
 cd poky
@@ -140,13 +140,13 @@ TUNE_FEATURES     = "arm armv7a vfp thumb callconvention-hard cortexa5"
 TARGET_FPU        = "hard"
 meta              
 meta-poky         
-meta-yocto-bsp    = "morty:bd063fa288b49b6e3ea77982d0ccc46610feb1ad"
-meta-atmel        = "morty:41cffff1bd4cc0e553b5b4a170cdbec9dec18443"
-meta-thornxt      = "morty:bb4a0e1cb51ce127b04db7bc8ad973e2cca9e672"
+meta-yocto-bsp    = "master:bd063fa288b49b6e3ea77982d0ccc46610feb1ad"
+meta-atmel        = "master:41cffff1bd4cc0e553b5b4a170cdbec9dec18443"
+meta-thornxt      = "master:bb4a0e1cb51ce127b04db7bc8ad973e2cca9e672"
 meta-oe           
 meta-networking   
-meta-python       = "morty:b063789560bfb9c60a7a15277b5b3a9839b5ba74"
-meta-qt5          = "morty:6605c48f3a900da26425ef31d83eb1c95d551531"
+meta-python       = "master:b063789560bfb9c60a7a15277b5b3a9839b5ba74"
+meta-qt5          = "master:6605c48f3a900da26425ef31d83eb1c95d551531"
 
 
 Contributing
