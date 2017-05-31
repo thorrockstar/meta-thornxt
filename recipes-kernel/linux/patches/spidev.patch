@@ -1,11 +1,10 @@
---- a/drivers/spi/spidev.c	2016-07-29 14:12:01.622688385 +0200
-+++ b/drivers/spi/spidev.c	2016-07-29 14:16:41.526692096 +0200
-@@ -706,6 +706,7 @@
- #ifdef CONFIG_OF
+--- a/drivers/spi/spidev.c
++++ b/drivers/spi/spidev.c
+@@ -695,6 +695,7 @@ static struct class *spidev_class;
  static const struct of_device_id spidev_dt_ids[] = {
  	{ .compatible = "rohm,dh2228fv" },
-+       { .compatible = "linux,spidev" },
+ 	{ .compatible = "lineartechnology,ltc2488" },
++	{ .compatible = "linux,spidev" },
  	{},
  };
  MODULE_DEVICE_TABLE(of, spidev_dt_ids);
-

@@ -1,28 +1,28 @@
---- a/common/lcd.c	2016-08-21 21:27:43.790637462 +0200
-+++ b/common/lcd.c	2016-08-29 16:54:09.314907771 +0200
-@@ -129,7 +129,7 @@
- static short console_row;
- 
- static void *lcd_console_address;
+--- a/common/lcd.c
++++ b/common/lcd.c
+@@ -51,7 +51,7 @@ static int lcd_color_fg;
+ static int lcd_color_bg;
+ int lcd_line_length;
+ char lcd_is_enabled = 0;
 -static void *lcd_base;			/* Start of framebuffer memory	*/
 +void *lcd_base;			/* Start of framebuffer memory	*/
- 
  static char lcd_flush_dcache;	/* 1 to flush dcache after each lcd update */
  
-@@ -438,6 +438,8 @@
+ /* Flush LCD activity to the caches */
+@@ -155,6 +155,8 @@ int drv_lcd_init(void)
  
- 	lcd_init(lcd_base);		/* LCD initialization */
+ 	lcd_init(lcd_base);
  
 +	return 0;
 +#if 0
  	/* Device initialization */
  	memset(&lcddev, 0, sizeof(lcddev));
  
-@@ -450,6 +452,7 @@
+@@ -167,6 +169,7 @@ int drv_lcd_init(void)
  	rc = stdio_register(&lcddev);
  
  	return (rc == 0) ? 1 : rc;
 +#endif
  }
  
- /*----------------------------------------------------------------------*/
+ void lcd_clear(void)
