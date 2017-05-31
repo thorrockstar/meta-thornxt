@@ -9,7 +9,16 @@
  static char lcd_flush_dcache;	/* 1 to flush dcache after each lcd update */
  
  /* Flush LCD activity to the caches */
-@@ -155,6 +155,8 @@ int drv_lcd_init(void)
+@@ -148,13 +148,17 @@ __weak int lcd_get_size(int *line_length)
+ 
+ int drv_lcd_init(void)
+ {
++#if 0
+ 	struct stdio_dev lcddev;
+ 	int rc;
++#endif
+ 
+ 	lcd_base = map_sysmem(gd->fb_base, 0);
  
  	lcd_init(lcd_base);
  
@@ -18,7 +27,7 @@
  	/* Device initialization */
  	memset(&lcddev, 0, sizeof(lcddev));
  
-@@ -167,6 +169,7 @@ int drv_lcd_init(void)
+@@ -167,6 +171,7 @@ int drv_lcd_init(void)
  	rc = stdio_register(&lcddev);
  
  	return (rc == 0) ? 1 : rc;
