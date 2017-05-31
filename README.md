@@ -134,7 +134,7 @@ BUILD_SYS         = "i686-linux"
 NATIVELSBSTRING   = "Ubuntu-16.04"
 TARGET_SYS        = "arm-poky-linux-gnueabi"
 MACHINE           = "sama5d3-xplained"
-DISTRO            = "poky"
+DISTRO            = "poky-atmel"
 DISTRO_VERSION    = "2.2.2"
 TUNE_FEATURES     = "arm armv7a vfp thumb            callconvention-hard            cortexa5"
 TARGET_FPU        = "hard"
@@ -142,7 +142,7 @@ meta
 meta-poky         
 meta-yocto-bsp    = "morty:d05941ae4567def4a288894717e5f550da246107"
 meta-atmel        = "morty:8c79606d3e73179506a6bbc40406f2c3aa9bf40e"
-meta-thornxt      = "morty:02ed0b534093c19e32b0f9d5e74eb657bdfee557"
+meta-thornxt      = "morty:824b7b7d95d1837806d9c9c454ae02ba6550968b"
 meta-oe           
 meta-networking   
 meta-python       = "morty:fe5c83312de11e80b85680ef237f8acb04b4b26e"
