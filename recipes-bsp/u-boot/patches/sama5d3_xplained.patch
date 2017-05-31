@@ -5,7 +5,7 @@
  #include <netdev.h>
  #include <spl.h>
 +#include <spi.h>
-+#include <lcd.h>
++#include <atmel_lcd.h>
 +
 +#include <atmel_hlcdc.h>
  #include <asm/arch/atmel_mpddrc.h>
