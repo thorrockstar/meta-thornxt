@@ -1,8 +1,8 @@
 --- a/board/atmel/sama5d3_xplained/sama5d3_xplained.c
 +++ b/board/atmel/sama5d3_xplained/sama5d3_xplained.c
-@@ -17,11 +17,4292 @@
- #include <net.h>
- #include <netdev.h>
+@@ -14,11 +14,4292 @@
+ #include <asm/arch/clk.h>
+ #include <debug_uart.h>
  #include <spl.h>
 +#include <configs/sama5d3_xplained.h>
 +#include <spi.h>
@@ -4293,7 +4293,21 @@
  #ifdef CONFIG_NAND_ATMEL
  void sama5d3_xplained_nand_hw_init(void)
  {
-@@ -92,16 +4373,29 @@ int board_init(void)
+@@ -59,13 +4340,6 @@ static void sama5d3_xplained_usb_hw_init(void)
+ }
+ #endif
+ 
+-#ifdef CONFIG_GENERIC_ATMEL_MCI
+-static void sama5d3_xplained_mci0_hw_init(void)
+-{
+-	at91_set_pio_output(AT91_PIO_PORTE, 2, 0);	/* MCI0 Power */
+-}
+-#endif
+-
+ #ifdef CONFIG_DEBUG_UART_BOARD_INIT
+ void board_debug_uart_init(void)
+ {
+@@ -91,11 +4365,21 @@ int board_init(void)
  #ifdef CONFIG_NAND_ATMEL
  	sama5d3_xplained_nand_hw_init();
  #endif
@@ -4310,36 +4324,9 @@
  #ifdef CONFIG_CMD_USB
  	sama5d3_xplained_usb_hw_init();
  #endif
-+
  #ifdef CONFIG_GENERIC_ATMEL_MCI
 -	sama5d3_xplained_mci0_hw_init();
 +	//sama5d3_xplained_mci0_hw_init();
  #endif
-+
- #ifdef CONFIG_MACB
--	at91_gmac_hw_init();
-+	//at91_gmac_hw_init();
- 	at91_macb_hw_init();
- #endif
-+
  	return 0;
  }
- 
-@@ -116,7 +4410,7 @@ int dram_init(void)
- int board_eth_init(bd_t *bis)
- {
- #ifdef CONFIG_MACB
--	macb_eth_initialize(0, (void *)ATMEL_BASE_GMAC, 0x00);
-+	//macb_eth_initialize(0, (void *)ATMEL_BASE_GMAC, 0x00);
- 	macb_eth_initialize(0, (void *)ATMEL_BASE_EMAC, 0x00);
- #endif
- 	return 0;
-@@ -187,7 +4481,7 @@ void mem_init(void)
- 
- 	ddr2_conf(&ddr2);
- 
--	/* Enable MPDDR clock */
-+	/* enable MPDDR clock */
- 	at91_periph_clk_enable(ATMEL_ID_MPDDRC);
- 	at91_system_clk_enable(AT91_PMC_DDR);
- 
