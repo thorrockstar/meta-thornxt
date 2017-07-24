@@ -9,8 +9,19 @@
   * SPDX-License-Identifier:	GPL-2.0+
   */
  
-@@ -43,6 +45,15 @@
- 	(CONFIG_SYS_SDRAM_BASE + 4 * 1024 - GENERATED_GBL_DATA_SIZE)
+@@ -12,6 +14,10 @@
+ 
+ #include "at91-sama5_common.h"
+ 
++#ifndef CONFIG_CONSOLE_SCROLL_LINES
++  #define CONFIG_CONSOLE_SCROLL_LINES 5
++#endif
++
+ /*
+  * This needs to be defined for the OHCI code to work but it is defined as
+  * ATMEL_ID_UHPHS in the CPU specific header files.
+@@ -35,6 +41,15 @@
+ 	(CONFIG_SYS_SDRAM_BASE + 16 * 1024 - GENERATED_GBL_DATA_SIZE)
  #endif
  
 +/* SPI for boot picture */
@@ -25,21 +36,13 @@
  /* NAND flash */
  #define CONFIG_CMD_NAND
  
-@@ -81,7 +92,7 @@
- #define CONFIG_PHYLIB
- 
- /* MMC */
--#define CONFIG_CMD_MMC
-+/*#define CONFIG_CMD_MMC*/
- 
- #ifdef CONFIG_CMD_MMC
- #define CONFIG_MMC
-@@ -91,7 +102,7 @@
- #endif
- 
- /* USB */
--#define CONFIG_CMD_USB
-+/*#define CONFIG_CMD_USB*/
- 
- #ifdef CONFIG_CMD_USB
- #define CONFIG_USB_ATMEL
+@@ -108,7 +123,8 @@
+ #elif CONFIG_SYS_USE_NANDFLASH
+ #define CONFIG_SPL_NAND_DRIVERS
+ #define CONFIG_SPL_NAND_BASE
+-#define CONFIG_SYS_NAND_U_BOOT_OFFS	0x40000
++#define CONFIG_SYS_NAND_U_BOOT_OFFS	0x20000
++#define CONFIG_SYS_NAND_U_BOOT_SIZE	0xA0000
+ #define CONFIG_SYS_NAND_5_ADDR_CYCLE
+ #define CONFIG_SYS_NAND_PAGE_SIZE	0x800
+ #define CONFIG_SYS_NAND_PAGE_COUNT	64
