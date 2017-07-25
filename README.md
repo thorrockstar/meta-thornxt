@@ -67,8 +67,7 @@ git clone git://github.com/meta-qt5/meta-qt5.git -b morty
 git clone git://github.com/linux4sam/meta-atmel.git -b morty
 
 5/ Clone meta-thornxt layer with the proper branch ready.
-   Keep in mind that you need a private key for this repository.
-git clone git@github.com:thorrockstar/meta-thornxt.git -b morty
+git clone git://github.com/thorrockstar/meta-thornxt.git
 
 6/ Enter the poky directory to configure the build system and start the build process
 cd poky
