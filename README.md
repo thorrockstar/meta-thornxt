@@ -22,7 +22,7 @@ Sources
 URI: git://github.com/thorrockstar/meta-thornxt.git
 URI: https://github.com/thorrockstar/meta-thornxt.git
 URI: ssh://git@github.com:thorrockstar/meta-thornxt.git
-Branch: morty
+Branch: krogoth
 
 
 Dependencies
@@ -32,19 +32,19 @@ This Layer depends on:
 - meta-openembedded
 URI: git://git.openembedded.org/meta-openembedded
 URI: http://cgit.openembedded.org/meta-openembedded/
-Branch: morty
+Branch: krogoth
 
 - meta-atmel
 URI: git://github.com/linux4sam/meta-atmel.git
 URI: https://github.com/linux4sam/meta-atmel.git
-Branch: morty
+Branch: krogoth
 
 Optionally for SDK building:
 
 - meta-qt5
 URI: git://github.com/meta-qt5/meta-qt5.git
 URI: https://github.com/meta-qt5/meta-qt5
-Branch: morty
+Branch: krogoth
 
 
 Build procedure
