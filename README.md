@@ -78,10 +78,6 @@ source oe-init-build-env build-atmel
 8/ Add meta-thornxt layer to bblayer configuration file
 vim conf/bblayers.conf
 
-# LAYER_CONF_VERSION is increased each time build/conf/bblayers.conf
-# changes incompatibly
-POKY_BBLAYERS_CONF_VERSION = "2"
-
 BBPATH = "${TOPDIR}"
 BBFILES ?= ""
 
