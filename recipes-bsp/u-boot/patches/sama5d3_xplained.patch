@@ -1,12 +1,12 @@
---- a/board/atmel/sama5d3_xplained/sama5d3_xplained.c
-+++ b/board/atmel/sama5d3_xplained/sama5d3_xplained.c
-@@ -14,11 +14,4292 @@
- #include <asm/arch/clk.h>
- #include <debug_uart.h>
+--- a/board/atmel/sama5d3_xplained/sama5d3_xplained.c	2016-08-01 12:11:47.206123308 +0200
++++ b/board/atmel/sama5d3_xplained/sama5d3_xplained.c	2016-08-01 11:48:42.134104000 +0200
+@@ -19,11 +19,4195 @@
+ #include <net.h>
+ #include <netdev.h>
  #include <spl.h>
-+#include <configs/sama5d3_xplained.h>
 +#include <spi.h>
 +#include <lcd.h>
++
 +#include <atmel_hlcdc.h>
  #include <asm/arch/atmel_mpddrc.h>
  #include <asm/arch/at91_wdt.h>
@@ -3762,7 +3762,7 @@
 +	.vl_row = 480,
 +	.vl_clk = 33333333,
 +	.vl_bpix = LCD_BPP,
-+	/*.vl_bpox = LCD_OUTPUT_BPP,*/
++	.vl_bpox = LCD_OUTPUT_BPP,
 +	.vl_tft = 1,
 +	.vl_hsync_len = 48,
 +	.vl_left_margin = 40,
@@ -4193,121 +4193,19 @@
 +
 +#endif
 +
-+#if defined(CONFIG_AT24MAC)
-+void at91_sync_env_enetaddr(uint8_t *ethaddr, uint8_t adapter)
-+{
-+	uint8_t env_ethaddr[6];
-+	int ret;
-+
-+	ret = eth_getenv_enetaddr_by_index("eth", adapter, env_ethaddr);
-+
-+	if (!ret) {
-+		/* init MAC address from EEPROM */
-+                debug("### Setting environment from EEPROM MAC address = "
-+                        "\"%pM\"\n",
-+                        env_ethaddr);
-+		if (adapter == 0) {
-+			ret = !eth_setenv_enetaddr("ethaddr", ethaddr);
-+		} else if (adapter == 1) {
-+			ret = !eth_setenv_enetaddr("eth1addr", ethaddr);
-+		}
-+        }
-+
-+	if (!ret) {
-+                printf("Failed to set mac address from EEPROM: %d\n", ret);
-+	}
-+}
-+
-+static int at91_read_at24mac_oui(uint8_t addr, uint8_t *buf)
-+{
-+	return 0;
-+
-+	if (i2c_read(addr, 0x9a, 1, (uint8_t*)&buf[0], 6)) {
-+		printf("Read from EEPROM @ 0x%02x failed\n", addr);
-+		return 0;
-+	} else {
-+		/* Check that MAC address is valid. */
-+		if (!is_valid_ether_addr(buf)) {
-+			printf("Found invalid MAC address: %d:%d:%d:%d:%d:%d\r\n", 
-+				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);
-+			return 0;
-+		}
-+	}
-+	/* found valid MAC! */
-+	return 1;
-+}
-+
-+#endif
-+
-+int misc_init_r(void)
-+{
-+#if defined(CONFIG_AT24MAC)
-+	int eeprom_mac_read;
-+	uint8_t env_ethaddr[6];
-+	uint8_t ethaddr[6];
-+	int ethaddr_found;
-+
-+	ethaddr_found = eth_getenv_enetaddr("ethaddr", env_ethaddr);
-+	eeprom_mac_read = at91_read_at24mac_oui(CONFIG_AT24MAC_ADDR, ethaddr);
-+
-+	if (!ethaddr_found) {
-+		if (eeprom_mac_read) {
-+			/* set MAC address from AT24MAC*/
-+			at91_sync_env_enetaddr(ethaddr, 0);
-+		} 
-+	} else {
-+		/* MAC address already in environment,
-+		 * compare with EEPROM and warn on mismatch
-+		 */
-+		if (eeprom_mac_read && memcmp(ethaddr, env_ethaddr, 6)) {
-+			printf("Warning: ethaddr MAC from AT24MAC doesn't match env\r\n");
-+			printf("Using MAC from environment\r\n");
-+		}
-+
-+	}
-+
-+#if CONFIG_AT24MAC_CNT == 2
-+	ethaddr_found = eth_getenv_enetaddr("eth1addr", env_ethaddr);
-+	eeprom_mac_read = at91_read_at24mac_oui(CONFIG_AT24MAC_ADDR1, ethaddr);
-+
-+	if (!ethaddr_found) {
-+		if (eeprom_mac_read) {
-+			/* set MAC address from AT24MAC*/
-+			at91_sync_env_enetaddr(ethaddr, 1);
-+		}
-+	} else {
-+		/* MAC address already in environment,
-+		 * compare with EEPROM and warn on mismatch
-+		 */
-+		if (eeprom_mac_read && memcmp(ethaddr, env_ethaddr, 6)) {
-+			printf("Warning: eth1addr MAC from AT24MAC doesn't match env\r\n");
-+			printf("Using MAC from environment\r\n");
-+		}
-+
-+	}
-+#endif
-+#endif
-+	return 0;
-+}
-+
- #ifdef CONFIG_NAND_ATMEL
- void sama5d3_xplained_nand_hw_init(void)
+ #if defined(CONFIG_AT24MAC)
+ void at91_sync_env_enetaddr(uint8_t *ethaddr, uint8_t adapter)
  {
-@@ -59,13 +4340,6 @@ static void sama5d3_xplained_usb_hw_init(void)
- }
- #endif
+@@ -51,6 +4235,8 @@
  
--#ifdef CONFIG_GENERIC_ATMEL_MCI
--static void sama5d3_xplained_mci0_hw_init(void)
--{
--	at91_set_pio_output(AT91_PIO_PORTE, 2, 0);	/* MCI0 Power */
--}
--#endif
--
- #ifdef CONFIG_DEBUG_UART_BOARD_INIT
- void board_debug_uart_init(void)
+ static int at91_read_at24mac_oui(uint8_t addr, uint8_t *buf)
  {
-@@ -91,11 +4365,21 @@ int board_init(void)
++	return 0;
++
+ 	if (i2c_read(addr, 0x9a, 1, (uint8_t*)&buf[0], 6)) {
+ 		printf("Read from EEPROM @ 0x%02x failed\n", addr);
+ 		return 0;
+@@ -189,16 +4375,29 @@
  #ifdef CONFIG_NAND_ATMEL
  	sama5d3_xplained_nand_hw_init();
  #endif
@@ -4324,9 +4222,35 @@
  #ifdef CONFIG_CMD_USB
  	sama5d3_xplained_usb_hw_init();
  #endif
++
  #ifdef CONFIG_GENERIC_ATMEL_MCI
 -	sama5d3_xplained_mci0_hw_init();
 +	//sama5d3_xplained_mci0_hw_init();
  #endif
++
+ #ifdef CONFIG_MACB
+-	at91_gmac_hw_init();
++	//at91_gmac_hw_init();
+ 	at91_macb_hw_init();
+ #endif
++
  	return 0;
  }
+ 
+@@ -213,7 +4412,7 @@
+ int board_eth_init(bd_t *bis)
+ {
+ #ifdef CONFIG_MACB
+-	macb_eth_initialize(0, (void *)ATMEL_BASE_GMAC, 0x00);
++	//macb_eth_initialize(0, (void *)ATMEL_BASE_GMAC, 0x00);
+ 	macb_eth_initialize(0, (void *)ATMEL_BASE_EMAC, 0x00);
+ #endif
+ 	return 0;
+@@ -309,4 +4508,6 @@
+ 	      AT91_PMC_MCKR_CSS_PLLA;
+ 	at91_mck_init(tmp);
+ }
+-#endif
++
++#endif /* #ifdef CONFIG_SPL_BUILD */
++

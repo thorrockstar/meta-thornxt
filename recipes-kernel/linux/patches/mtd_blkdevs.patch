@@ -1,0 +1,11 @@
+--- a/drivers/mtd/mtd_blkdevs.c	2016-08-16 22:25:09.430510053 +0200
++++ b/drivers/mtd/mtd_blkdevs.c	2016-08-16 22:53:18.470840169 +0200
+@@ -97,7 +97,7 @@
+ 	if (req->cmd_flags & REQ_DISCARD)
+ 		return tr->discard(dev, block, nsect);
+ 
+-	switch(rq_data_dir(req)) {
++	switch(((req)->cmd_flags & 1)) {
+ 	case READ:
+ 		for (; nsect > 0; nsect--, block++, buf += tr->blksize)
+ 			if (tr->readsect(dev, block, buf))

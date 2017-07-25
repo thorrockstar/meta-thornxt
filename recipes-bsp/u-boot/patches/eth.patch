@@ -1,26 +1,13 @@
----  a/net/eth-uclass.c	
-+++  b/net/eth-uclass.c
-@@ -517,8 +517,8 @@ static int eth_post_probe(struct udevice *dev)
- 		printf("\nWarning: %s (eth%d) using random MAC address - %pM\n",
- 		       dev->name, dev->seq, pdata->enetaddr);
- #else
+--- a/net/eth.c	2016-08-01 12:11:47.954123318 +0200
++++ b/net/eth.c	2016-07-29 12:49:29.906622000 +0200
+@@ -184,8 +184,8 @@
+ 		printf("\nWarning: %s using MAC address from net device\n",
+ 			dev->name);
+ 	} else if (!(eth_address_set(dev->enetaddr))) {
 -		printf("\nError: %s address not set.\n",
 -		       dev->name);
 +		//printf("\nError: %s address not set.\n",
-+		//       dev->name);
++		//     dev->name);
  		return -EINVAL;
- #endif
  	}
----  a/net/eth_legacy.c	
-+++  b/net/eth_legacy.c
-@@ -159,8 +159,8 @@ int eth_write_hwaddr(struct eth_device *dev, const char *base_name,
- 		printf("\nWarning: %s (eth%d) using random MAC address - %pM\n",
- 		       dev->name, eth_number, dev->enetaddr);
- #else
--		printf("\nError: %s address not set.\n",
--		       dev->name);
-+		//printf("\nError: %s address not set.\n",
-+		//       dev->name);
- 		return -EINVAL;
- #endif
- 	}
+ 

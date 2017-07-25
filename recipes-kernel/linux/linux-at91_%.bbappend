@@ -4,10 +4,14 @@ SRC_URI += " \
 	file://defconfig \
 	file://spidev.patch;patch=1 \
 	file://at91_can.patch;patch=1 \
+	file://at91_ssc.patch;patch=1 \
 	file://atmel_ssm2518.patch;patch=1 \
 	file://Kconfig.patch;patch=1 \
 	file://Makefile.patch;patch=1 \
 	file://panel-simple.patch;patch=1 \
+	file://ssm2518.patch;patch=1 \
+	file://mtd_blkdevs.patch;patch=1 \
+	file://can_dev.patch;patch=1 \
 	file://at91-sama5d3_thor-nxt2.dts;subdir=git/arch/${ARCH}/boot/dts \
 "
 
