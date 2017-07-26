@@ -118,7 +118,7 @@ To get better performance, use the "poky-atmel" distribution by also adding that
 line:
 DISTRO = "poky-atmel"
 
-!!IMPORTANT!!
+**IMPORTANT**
 9/ Double check that in the kernel configuration 'General Setup->Timers subsystem->High Resolution Timer Support'
 has been turned off as well as 'General Setup->Timers subsystem->Timer tick handling' is set to 'Periodic timer ticks'.
 This should be done by the 'defconfig' but double check before building because it is cruicial.
