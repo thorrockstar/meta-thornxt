@@ -76,51 +76,52 @@ cd poky
 source oe-init-build-env build-atmel
 
 8/ Add meta-thornxt layer to bblayer configuration file
-vim conf/bblayers.conf
+    vim conf/bblayers.conf
 
-BBPATH = "${TOPDIR}"
-BBFILES ?= ""
-
-BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../../..')}"
-
-BBLAYERS ?= " \
-  ${BSPDIR}/poky/meta \
-  ${BSPDIR}/poky/meta-poky \
-  ${BSPDIR}/poky/meta-yocto-bsp \
-  ${BSPDIR}/meta-atmel \
-  ${BSPDIR}/meta-thornxt \
-  ${BSPDIR}/meta-openembedded/meta-oe \
-  ${BSPDIR}/meta-openembedded/meta-networking \
-  ${BSPDIR}/meta-openembedded/meta-python \
-  ${BSPDIR}/meta-qt5 \
-  "
-
-BLAYERS_NON_REMOVABLE ?= " \
-  ${BSPDIR}/poky/meta \
-  ${BSPDIR}/poky/meta-poky \
-  "
+    BBPATH = "${TOPDIR}"
+    BBFILES ?= ""
+    
+    BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../../..')}"
+    
+    BBLAYERS ?= " \
+      ${BSPDIR}/poky/meta \
+      ${BSPDIR}/poky/meta-poky \
+      ${BSPDIR}/poky/meta-yocto-bsp \
+      ${BSPDIR}/meta-atmel \
+      ${BSPDIR}/meta-thornxt \
+      ${BSPDIR}/meta-openembedded/meta-oe \
+      ${BSPDIR}/meta-openembedded/meta-networking \
+      ${BSPDIR}/meta-openembedded/meta-python \
+      ${BSPDIR}/meta-qt5 \
+      "
+    
+    BLAYERS_NON_REMOVABLE ?= " \
+      ${BSPDIR}/poky/meta \
+      ${BSPDIR}/poky/meta-poky \
+      "
 
 8/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
 Pick one MACHINE name from the "Supported SoCs / MACHINE names" chapter above
 and edit the "local.conf" file. Here is an example:
-
 vim conf/local.conf
-[...]
-MACHINE ??= "sama5d3-xplained"
-[...]
-DL_DIR ?= "your_download_directory_path"
-[...]
-PACKAGE_CLASSES ?= "package_ipk"
-[...]
-USER_CLASSES ?= "buildstats image-mklibs"
+
+    [...]
+    MACHINE ??= "sama5d3-xplained"
+    [...]
+    DL_DIR ?= "your_download_directory_path"
+    [...]
+    PACKAGE_CLASSES ?= "package_ipk"
+    [...]
+    USER_CLASSES ?= "buildstats image-mklibs"
 
 To get better performance, use the "poky-atmel" distribution by also adding that
 line:
-DISTRO = "poky-atmel"
+    DISTRO = "poky-atmel"
 
 **IMPORTANT**
-9/ Double check that in the kernel configuration 'General Setup->Timers subsystem->High Resolution Timer Support'
-has been turned off as well as 'General Setup->Timers subsystem->Timer tick handling' is set to 'Periodic timer ticks'.
+
+9/ Double check that in the kernel configuration **'General Setup->Timers subsystem->High Resolution Timer Support'**
+has been turned **off** as well as **'General Setup->Timers subsystem->Timer tick handling'** is set to **'Periodic timer ticks'**.
 This should be done by the 'defconfig' but double check before building because it is cruicial.
 
 10/ Build Thor demo images
