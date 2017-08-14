@@ -1,0 +1,13 @@
+--- a/net/eth_legacy.c
++++ b/net/eth_legacy.c
+@@ -257,8 +257,8 @@ int eth_initialize(void)
+ 	}
+ 
+ 	if (!eth_devices) {
+-		puts("No ethernet found.\n");
+-		bootstage_error(BOOTSTAGE_ID_NET_ETH_START);
++		//puts("No ethernet found.\n");
++		//bootstage_error(BOOTSTAGE_ID_NET_ETH_START);
+ 	} else {
+ 		struct eth_device *dev = eth_devices;
+ 		char *ethprime = getenv("ethprime");
