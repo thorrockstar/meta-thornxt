@@ -72,7 +72,7 @@ Build procedure
     export CROSS_COMPILE=arm-linux-gnueabi-  
     source oe-init-build-env build-atmel
 
-8/ Add meta-thornxt layer to bblayer configuration file  
+8/ Add meta-thornxt layer to bblayer configuration file.  
     vi conf/bblayers.conf
 
     BBPATH = "${TOPDIR}"
@@ -104,8 +104,6 @@ and edit the "local.conf" file. Here is an example:
 
     [...]
     MACHINE ??= "sama5d3-xplained"
-    [...]
-    DL_DIR ?= "your_download_directory_path"
     [...]
     PACKAGE_CLASSES ?= "package_ipk"
     [...]
