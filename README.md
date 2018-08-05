@@ -120,28 +120,28 @@ vim conf/local.conf
 9/ Build Thor demo images.  
    bitbake atmel-xplained-demo-image
 
-Typical bitbake output
-======================
-Build Configuration:
-BB_VERSION        = "1.34.0"
-BUILD_SYS         = "i686-linux"
-NATIVELSBSTRING   = "universal"
-TARGET_SYS        = "arm-poky-linux-gnueabi"
-MACHINE           = "sama5d3-xplained"
-DISTRO            = "poky-atmel"
-DISTRO_VERSION    = "2.3"
-TUNE_FEATURES     = "arm armv7a vfp thumb callconvention-hard cortexa5"
-TARGET_FPU        = "hard"
-meta              
-meta-poky         
-meta-yocto-bsp    = "master:bd063fa288b49b6e3ea77982d0ccc46610feb1ad"
-meta-atmel        = "master:41cffff1bd4cc0e553b5b4a170cdbec9dec18443"
-meta-thornxt      = "master:bb4a0e1cb51ce127b04db7bc8ad973e2cca9e672"
-meta-oe           
-meta-networking   
-meta-python       = "master:b063789560bfb9c60a7a15277b5b3a9839b5ba74"
-meta-qt5          = "master:6605c48f3a900da26425ef31d83eb1c95d551531"
-
+    Typical bitbake output
+    ======================
+    Build Configuration:
+    BB_VERSION        = "1.34.0"
+    BUILD_SYS         = "i686-linux"
+    NATIVELSBSTRING   = "universal"
+    TARGET_SYS        = "arm-poky-linux-gnueabi"
+    MACHINE           = "sama5d3-xplained"
+    DISTRO            = "poky-atmel"
+    DISTRO_VERSION    = "2.3"
+    TUNE_FEATURES     = "arm armv7a vfp thumb callconvention-hard cortexa5"
+    TARGET_FPU        = "hard"
+    meta              
+    meta-poky         
+    meta-yocto-bsp    = "master:bd063fa288b49b6e3ea77982d0ccc46610feb1ad"
+    meta-atmel        = "master:41cffff1bd4cc0e553b5b4a170cdbec9dec18443"
+    meta-thornxt      = "master:bb4a0e1cb51ce127b04db7bc8ad973e2cca9e672"
+    meta-oe           
+    meta-networking   
+    meta-python       = "master:b063789560bfb9c60a7a15277b5b3a9839b5ba74"
+    meta-qt5          = "master:6605c48f3a900da26425ef31d83eb1c95d551531"
+    
 
 Contributing
 ============
