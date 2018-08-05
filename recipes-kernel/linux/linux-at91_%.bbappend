@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/patches:"
 
 SRC_URI += " \
-	file://defconfig \
+	file://defconfig_thor \
 	file://spidev.patch;patch=1 \
 	file://at91_can.patch;patch=1 \
 	file://atmel_ssm2518.patch;patch=1 \
@@ -16,3 +16,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 MACHINE_FEATURES_remove = "camera"
 
 KERNEL_DEVICETREE += "at91-sama5d3_thor-nxt2.dtb"
+
+do_configure_prepend() {
+    mv ${WORKDIR}/defconfig_thor ${WORKDIR}/defconfig
+    cp ${WORKDIR}/defconfig ${WORKDIR}/build/.config
+}
