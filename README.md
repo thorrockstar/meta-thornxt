@@ -50,33 +50,34 @@ Branch: krogoth
 Build procedure
 ===============
 
-0/ Create a directory
-mkdir my_dir
-cd my_dir
+0/ Create a directory  
+    mkdir my_dir  
+    cd my_dir  
 
-1/ Clone yocto/poky git repository with the proper branch ready.
-git clone git://git.yoctoproject.org/poky
+1/ Clone yocto/poky git repository with the proper branch ready.  
+    git clone git://git.yoctoproject.org/poky
 
-2/ Clone meta-openembedded git repository with the proper branch ready.
-git clone git://git.openembedded.org/meta-openembedded
+2/ Clone meta-openembedded git repository with the proper branch ready.  
+    git clone git://git.openembedded.org/meta-openembedded
 
-3/ Clone meta-qt5 git repository with the proper branch ready
-git clone git://github.com/meta-qt5/meta-qt5.git
+3/ Clone meta-qt5 git repository with the proper branch ready.  
+    git clone git://github.com/meta-qt5/meta-qt5.git
 
-4/ Clone meta-atmel layer with the proper branch ready.
-git clone git://github.com/linux4sam/meta-atmel.git
+4/ Clone meta-atmel layer with the proper branch ready.  
+    git clone git://github.com/linux4sam/meta-atmel.git
 
-5/ Clone meta-thornxt layer with the proper branch ready.
-git clone git://github.com/thorrockstar/meta-thornxt.git
+5/ Clone meta-thornxt layer with the proper branch ready.  
+    git clone git://github.com/thorrockstar/meta-thornxt.git
 
-6/ Enter the poky directory to configure the build system and start the build process
-cd poky
+6/ Enter the poky directory to configure the build system and start the build process.  
+    cd poky
 
-7/ Initialize build directory
-source oe-init-build-env build-atmel
+7/ Initialize build directory  
+    export CROSS_COMPILE=arm-linux-gnueabi-  
+    source oe-init-build-env build-atmel
 
-8/ Add meta-thornxt layer to bblayer configuration file
-vim conf/bblayers.conf
+8/ Add meta-thornxt layer to bblayer configuration file.  
+    vi conf/bblayers.conf
 
 BBPATH = "${TOPDIR}"
 BBFILES ?= ""
@@ -102,24 +103,22 @@ BLAYERS_NON_REMOVABLE ?= " \
 
 8/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
 Pick one MACHINE name from the "Supported SoCs / MACHINE names" chapter above
-and edit the "local.conf" file. Here is an example:
+and edit the "local.conf" file. Here is an example:  
+vim conf/local.conf  
 
-vim conf/local.conf
-[...]
-MACHINE ??= "sama5d3-xplained"
-[...]
-DL_DIR ?= "your_download_directory_path"
-[...]
-PACKAGE_CLASSES ?= "package_ipk"
-[...]
-USER_CLASSES ?= "buildstats image-mklibs"
+    [...]
+    MACHINE ??= "sama5d3-xplained"
+    [...]
+    DL_DIR ?= "your_download_directory_path"
+    [...]
+    PACKAGE_CLASSES ?= "package_ipk"
+    [...]
+    USER_CLASSES ?= "buildstats image-mklibs"
+    [...]
+    DISTRO = "poky-atmel"
 
-To get better performance, use the "poky-atmel" distribution by also adding that
-line:
-DISTRO = "poky-atmel"
-
-9/ Build Thor demo images
-bitbake atmel-xplained-demo-image
+9/ Build Thor demo images.  
+   bitbake atmel-xplained-demo-image
 
 Typical bitbake output
 ======================
