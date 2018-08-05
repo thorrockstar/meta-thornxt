@@ -51,39 +51,39 @@ Build procedure
 ===============
 
 0/ Create a directory
-mkdir morty_poky
-cd morty_poky
+  mkdir morty_poky
+  cd morty_poky
 
 1/ Clone yocto/poky git repository with the proper branch ready.
- git clone git://git.yoctoproject.org/poky -b morty
+  git clone git://git.yoctoproject.org/poky -b morty
 
 2/ Clone meta-openembedded git repository with the proper branch ready.
- git clone git://git.openembedded.org/meta-openembedded -b morty
+  git clone git://git.openembedded.org/meta-openembedded -b morty
 
 3/ Clone meta-qt5 git repository with the proper branch ready
- git clone git://github.com/meta-qt5/meta-qt5.git -b morty
+  git clone git://github.com/meta-qt5/meta-qt5.git -b morty
 
 4/ Clone meta-atmel layer with the proper branch ready.
- git clone git://github.com/linux4sam/meta-atmel.git -b morty
+  git clone git://github.com/linux4sam/meta-atmel.git -b morty
 
 5/ Clone meta-thornxt layer with the proper branch ready.
- git clone git://github.com/thorrockstar/meta-thornxt.git
+  git clone git://github.com/thorrockstar/meta-thornxt.git
 
 6/ Enter the poky directory to configure the build system and start the build process
- cd poky
+  cd poky
 
 7/ Initialize build directory and set compiler.
- export CROSS_COMPILE=arm-linux-gnueabi-
- source oe-init-build-env build-atmel
+  export CROSS_COMPILE=arm-linux-gnueabi-
+  source oe-init-build-env build-atmel
 
 8/ Add meta-thornxt layer to bblayer configuration file
- vi conf/bblayers.conf
+  vi conf/bblayers.conf
 
     BBPATH = "${TOPDIR}"
     BBFILES ?= ""
-    
+
     BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../../..')}"
-    
+
     BBLAYERS ?= " \
       ${BSPDIR}/poky/meta \
       ${BSPDIR}/poky/meta-poky \
@@ -95,7 +95,7 @@ cd morty_poky
       ${BSPDIR}/meta-openembedded/meta-python \
       ${BSPDIR}/meta-qt5 \
       "
-    
+
     BLAYERS_NON_REMOVABLE ?= " \
       ${BSPDIR}/poky/meta \
       ${BSPDIR}/poky/meta-poky \
@@ -104,7 +104,7 @@ cd morty_poky
 8/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
 Pick one MACHINE name from the "Supported SoCs / MACHINE names" chapter above
 and edit the "local.conf" file. Here is an example:
- vi conf/local.conf
+  vi conf/local.conf
 
     [...]
     MACHINE ??= "sama5d3-xplained"
@@ -124,7 +124,7 @@ has been turned **off** as well as **'General Setup->Timers subsystem->Timer tic
 This should be done by the 'defconfig' but double check before building because it is cruicial.
 
 10/ Build Thor demo images
-bitbake atmel-xplained-demo-image
+  bitbake atmel-xplained-demo-image
 
 Typical bitbake output
 ======================
