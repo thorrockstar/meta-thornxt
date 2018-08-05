@@ -73,7 +73,7 @@ Build procedure
     cd poky
 
 7/ Initialize build directory and set compiler.  
-    export CROSS_COMPILE=arm-linux-gnueabi-
+    export CROSS_COMPILE=arm-linux-gnueabi-  
     source oe-init-build-env build-atmel
 
 8/ Add meta-thornxt layer to bblayer configuration file  
