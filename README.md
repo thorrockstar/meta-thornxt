@@ -50,33 +50,33 @@ Branch: morty
 Build procedure
 ===============
 
-0/ Create a directory
-    mkdir morty_poky
+0/ Create a directory  
+    mkdir morty_poky  
     cd morty_poky
 
-1/ Clone yocto/poky git repository with the proper branch ready.
+1/ Clone yocto/poky git repository with the proper branch ready.  
     git clone git://git.yoctoproject.org/poky -b morty
 
-2/ Clone meta-openembedded git repository with the proper branch ready.
+2/ Clone meta-openembedded git repository with the proper branch ready.  
     git clone git://git.openembedded.org/meta-openembedded -b morty
 
-3/ Clone meta-qt5 git repository with the proper branch ready
+3/ Clone meta-qt5 git repository with the proper branch ready  
     git clone git://github.com/meta-qt5/meta-qt5.git -b morty
 
-4/ Clone meta-atmel layer with the proper branch ready.
+4/ Clone meta-atmel layer with the proper branch ready.  
     git clone git://github.com/linux4sam/meta-atmel.git -b morty
 
-5/ Clone meta-thornxt layer with the proper branch ready.
+5/ Clone meta-thornxt layer with the proper branch ready.  
     git clone git://github.com/thorrockstar/meta-thornxt.git
 
-6/ Enter the poky directory to configure the build system and start the build process
+6/ Enter the poky directory to configure the build system and start the build process  
     cd poky
 
-7/ Initialize build directory and set compiler.
+7/ Initialize build directory and set compiler.  
     export CROSS_COMPILE=arm-linux-gnueabi-
     source oe-init-build-env build-atmel
 
-8/ Add meta-thornxt layer to bblayer configuration file
+8/ Add meta-thornxt layer to bblayer configuration file  
     vi conf/bblayers.conf
 
     BBPATH = "${TOPDIR}"
@@ -103,7 +103,7 @@ Build procedure
 
 8/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
 Pick one MACHINE name from the "Supported SoCs / MACHINE names" chapter above
-and edit the "local.conf" file. Here is an example:
+and edit the "local.conf" file. Here is an example:  
     vi conf/local.conf
 
     [...]
@@ -123,7 +123,7 @@ and edit the "local.conf" file. Here is an example:
 has been turned **off** as well as **'General Setup->Timers subsystem->Timer tick handling'** is set to **'Periodic timer ticks'**.
 This should be done by the 'defconfig' but double check before building because it is cruicial.
 
-10/ Build Thor demo images
+10/ Build Thor demo images  
     bitbake atmel-xplained-demo-image
 
 Typical bitbake output
