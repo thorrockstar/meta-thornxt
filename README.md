@@ -46,9 +46,9 @@ URI: https://github.com/meta-qt5/meta-qt5
 Build procedure
 ===============
 
-0/ Create a directory
-mkdir poky
-cd poky
+0/ Create a directory  
+    mkdir poky  
+    cd poky
 
 1/ Clone yocto/poky git repository with the proper branch ready.  
     git clone git://git.yoctoproject.org/poky
