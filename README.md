@@ -46,7 +46,7 @@ URI: https://github.com/meta-qt5/meta-qt5
 Build procedure
 ===============
 
-0/ Create a directory  
+0/ Create a directory.  
     mkdir poky  
     cd poky
 
@@ -56,7 +56,7 @@ Build procedure
 2/ Clone meta-openembedded git repository with the proper branch ready.  
     git clone git://git.openembedded.org/meta-openembedded
 
-3/ Clone meta-qt5 git repository with the proper branch ready  
+3/ Clone meta-qt5 git repository with the proper branch ready. 
     git clone git://github.com/meta-qt5/meta-qt5.git
 
 4/ Clone meta-atmel layer with the proper branch ready.  
@@ -68,7 +68,7 @@ Build procedure
 6/ Enter the poky directory to configure the build system and start the build process.  
    cd poky
 
-7/ Initialize build directory  
+7/ Initialize build directory and set compiler.  
     export CROSS_COMPILE=arm-linux-gnueabi-  
     source oe-init-build-env build-atmel
 
