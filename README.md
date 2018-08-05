@@ -67,7 +67,7 @@ Build procedure
     git clone git://github.com/linux4sam/meta-atmel.git -b morty
 
 5/ Clone meta-thornxt layer with the proper branch ready.  
-    git clone git://github.com/thorrockstar/meta-thornxt.git
+    git clone git://github.com/thorrockstar/meta-thornxt.git -b morty
 
 6/ Enter the poky directory to configure the build system and start the build process  
     cd poky
