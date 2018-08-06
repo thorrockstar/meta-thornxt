@@ -51,19 +51,19 @@ Build procedure
     cd poky
 
 1/ Clone yocto/poky git repository with the proper branch ready.  
-    git clone git://git.yoctoproject.org/poky
+    git clone git://git.yoctoproject.org/poky -b rocko
 
 2/ Clone meta-openembedded git repository with the proper branch ready.  
-    git clone git://git.openembedded.org/meta-openembedded
+    git clone git://git.openembedded.org/meta-openembedded -b rocko
 
 3/ Clone meta-qt5 git repository with the proper branch ready. 
-    git clone git://github.com/meta-qt5/meta-qt5.git
+    git clone git://github.com/meta-qt5/meta-qt5.git -b rocko
 
 4/ Clone meta-atmel layer with the proper branch ready.  
-    git clone git://github.com/linux4sam/meta-atmel.git
+    git clone git://github.com/linux4sam/meta-atmel.git -b rocko
 
 5/ Clone meta-thornxt layer with the proper branch ready.  
-    git clone git://github.com/thorrockstar/meta-thornxt.git
+    git clone git://github.com/thorrockstar/meta-thornxt.git -b rocko
 
 6/ Enter the poky directory to configure the build system and start the build process.  
    cd poky
@@ -123,24 +123,24 @@ This should be done by the 'defconfig' but double check before building because 
 Typical bitbake output
 ======================
     Build Configuration:
-    BB_VERSION        = "1.32.0"
-    BUILD_SYS         = "i686-linux"
-    NATIVELSBSTRING   = "Ubuntu-16.04"
-    TARGET_SYS        = "arm-poky-linux-gnueabi"
-    MACHINE           = "sama5d3-xplained"
-    DISTRO            = "poky-atmel"
-    DISTRO_VERSION    = "2.2.2"
-    TUNE_FEATURES     = "arm armv7a vfp thumb            callconvention-hard            cortexa5"
-    TARGET_FPU        = "hard"
-    meta              
-    meta-poky         
-    meta-yocto-bsp    = "master:d05941ae4567def4a288894717e5f550da246107"
-    meta-atmel        = "master:8c79606d3e73179506a6bbc40406f2c3aa9bf40e"
-    meta-thornxt      = "master:824b7b7d95d1837806d9c9c454ae02ba6550968b"
-    meta-oe           
-    meta-networking   
-    meta-python       = "master:fe5c83312de11e80b85680ef237f8acb04b4b26e"
-    meta-qt5          = "master:3601fd2c5306ac6d5d0d536e0be8cbb90da9b4c1"
+    BB_VERSION           = "1.36.0"
+    BUILD_SYS            = "i686-linux"
+    NATIVELSBSTRING      = "ubuntu-16.04"
+    TARGET_SYS           = "arm-poky-linux-gnueabi"
+    MACHINE              = "sama5d3-xplained"
+    DISTRO               = "poky-atmel"
+    DISTRO_VERSION       = "2.4.3"
+    TUNE_FEATURES        = "arm armv7a vfp thumb callconvention-hard cortexa5"
+    TARGET_FPU           = "hard"
+    meta                 
+    meta-poky            
+    meta-yocto-bsp       = "rocko:9ed1178c87afce997d5a21cadae7461fb6bb48da"
+    meta-atmel           = "rocko:d77d8716376781aab08cb68fdc68361e6feeb154"
+    meta-thornxt         = "rocko:c31f1c50664d7539d6a551d25e5768737494548b"
+    meta-oe              
+    meta-networking      
+    meta-python          = "rocko:352531015014d1957d6444d114f4451e241c4d23"
+    meta-qt5             = "rocko:682ad61c071a9710e9f9d8a32ab1b5f3c14953d1"
 
 Contributing
 ============
