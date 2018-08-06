@@ -22,9 +22,6 @@ IMAGE_INSTALL_append = "\
 	glibc \
 	glib-2.0 \
     \
-	linux-firmware-atmel \
-	linux-firmware-atmel-license \
-    \
 	linux-firmware-iwlwifi \
     \
 	linux-firmware-ralink-license \
