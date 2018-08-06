@@ -142,6 +142,37 @@ Typical bitbake output
     meta-python          = "rocko:352531015014d1957d6444d114f4451e241c4d23"
     meta-qt5             = "rocko:682ad61c071a9710e9f9d8a32ab1b5f3c14953d1"
 
+Note/Issues
+===========
+
+You may encounter the problem that after bulding the image 'newusers' and 'chpassw' gives you an error in the way of:
+
+    root@sama5d3-xplained:~# newusers
+    newusers: PAM: Authentication failure
+    root@sama5d3-xplained:~# chpasswd
+    chpasswd: PAM: Authentication failure
+
+To fix this you will need this patch that modifies the shadow files in the 'meta/recipes-extended/shadow/files/pam.d' folder before building the Yocto image.
+
+     --- a/meta/recipes-extended/shadow/files/pam.d/chpasswd
+     +++ b/meta/recipes-extended/shadow/files/pam.d/chpasswd
+     @@ -1,4 +1,6 @@
+     # The PAM configuration file for the Shadow 'chpasswd' service
+     #
+     +auth       sufficient   pam_rootok.so
+     +account    required     pam_permit.so
+      password   include      common-password
+
+
+     --- a/meta/recipes-extended/shadow/files/pam.d/newusers
+     +++ b/meta/recipes-extended/shadow/files/pam.d/newusers
+     @@ -1,4 +1,6 @@
+      # The PAM configuration file for the Shadow 'newusers' service
+      #
+     +auth       sufficient   pam_rootok.so
+     +account    required     pam_permit.so
+      password   include      common-password
+
 Contributing
 ============
 To contribute to this layer you should submit the patches for review to:
