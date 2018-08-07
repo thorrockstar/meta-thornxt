@@ -23,12 +23,14 @@ IMAGE_INSTALL_append = "\
 	glib-2.0 \
 	"
 
-# fix PAM issue for chpassw and newuser
-	
+# Fix PAM files for chpassw and newusers.
+
+PAMFILESPATH_EXTRA := "${THISDIR}/files"
+
 ROOTFS_POSTPROCESS_COMMAND += " fix_pam_files ; "
 
 fix_pam_files () {
-	cp ${THISDIR}/../../../meta-thornxt/recipes-atmel/images/files/chpasswd ${IMAGE_ROOTFS}/etc/pam.d/
-	cp ${THISDIR}/../../../meta-thornxt/recipes-atmel/images/files/newusers ${IMAGE_ROOTFS}/etc/pam.d/
+    install -c -m 0644 ${PAMFILESPATH_EXTRA}/chpasswd ${IMAGE_ROOTFS}/etc/pam.d/
+    install -c -m 0644 ${PAMFILESPATH_EXTRA}/newusers ${IMAGE_ROOTFS}/etc/pam.d/
 }
 
