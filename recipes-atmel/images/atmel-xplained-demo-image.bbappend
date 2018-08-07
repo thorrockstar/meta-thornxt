@@ -22,3 +22,11 @@ IMAGE_INSTALL_append = "\
 	glibc \
 	glib-2.0 \
 	"
+
+ROOTFS_POSTPROCESS_COMMAND += " fix_pam_files ; "
+
+fix_pam_files () {
+	cp ${THISDIR}/../../../meta-thornxt/recipes-atmel/images/files/chpasswd ${IMAGE_ROOTFS}/etc/pam.d/
+	cp ${THISDIR}/../../../meta-thornxt/recipes-atmel/images/files/newusers ${IMAGE_ROOTFS}/etc/pam.d/
+}
+
