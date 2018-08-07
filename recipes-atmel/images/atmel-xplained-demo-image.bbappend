@@ -23,6 +23,8 @@ IMAGE_INSTALL_append = "\
 	glib-2.0 \
 	"
 
+# fix PAM issue for chpassw and newuser
+	
 ROOTFS_POSTPROCESS_COMMAND += " fix_pam_files ; "
 
 fix_pam_files () {
