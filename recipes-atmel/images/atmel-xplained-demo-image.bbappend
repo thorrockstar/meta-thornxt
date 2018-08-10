@@ -35,5 +35,5 @@ fix_pam_files () {
 }
 
 fix_udev_files () {
-    install -c -m 0644 ${PAMFILESPATH_EXTRA}/systemd-udevd ${IMAGE_ROOTFS}/etc/init.d/
+    install -c -m 0755 ${PAMFILESPATH_EXTRA}/systemd-udevd ${IMAGE_ROOTFS}/etc/init.d/
 }
