@@ -14,7 +14,7 @@ IMAGE_INSTALL_remove = "\
 	python-pycurl \	
 	linux-firmware \
 	linux-firmware-atmel \
-    linux-firmware-atmel-license \
+	linux-firmware-atmel-license \
 	"
 
 # add important components to image
