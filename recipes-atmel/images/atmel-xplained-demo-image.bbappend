@@ -27,10 +27,13 @@ IMAGE_INSTALL_append = "\
 
 PAMFILESPATH_EXTRA := "${THISDIR}/files"
 
-ROOTFS_POSTPROCESS_COMMAND += " fix_pam_files ; "
+ROOTFS_POSTPROCESS_COMMAND += " fix_pam_files ; fix_udev_files ; "
 
 fix_pam_files () {
     install -c -m 0644 ${PAMFILESPATH_EXTRA}/chpasswd ${IMAGE_ROOTFS}/etc/pam.d/
     install -c -m 0644 ${PAMFILESPATH_EXTRA}/newusers ${IMAGE_ROOTFS}/etc/pam.d/
 }
 
+fix_udev_files () {
+    install -c -m 0644 ${PAMFILESPATH_EXTRA}/systemd-udevd ${IMAGE_ROOTFS}/etc/init.d/
+}
