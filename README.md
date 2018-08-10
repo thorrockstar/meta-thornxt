@@ -56,7 +56,7 @@ Build procedure
 2/ Clone meta-openembedded git repository with the proper branch ready.  
     git clone git://git.openembedded.org/meta-openembedded -b rocko
 
-3/ Clone meta-qt5 git repository with the proper branch ready. 
+3/ Clone meta-qt5 git repository with the proper branch ready.  
     git clone git://github.com/meta-qt5/meta-qt5.git -b rocko
 
 4/ Clone meta-atmel layer with the proper branch ready.  
@@ -77,9 +77,9 @@ Build procedure
 
     BBPATH = "${TOPDIR}"
     BBFILES ?= ""
-    
+
     BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../../..')}"
-    
+
     BBLAYERS ?= " \
       ${BSPDIR}/poky/meta \
       ${BSPDIR}/poky/meta-poky \
@@ -91,7 +91,7 @@ Build procedure
       ${BSPDIR}/meta-openembedded/meta-python \
       ${BSPDIR}/meta-qt5 \
       "
-    
+
     BLAYERS_NON_REMOVABLE ?= " \
       ${BSPDIR}/poky/meta \
       ${BSPDIR}/poky/meta-poky \
