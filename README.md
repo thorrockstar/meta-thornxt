@@ -109,7 +109,7 @@ and edit the "local.conf" file. Here is an example:
     [...]
     USER_CLASSES ?= "buildstats image-mklibs"
     [...]
-    DISTRO = "poky-atmel"
+    DISTRO ?= "poky-atmel"
 
 **IMPORTANT**
 
