@@ -56,7 +56,7 @@ Build procedure
 2/ Clone meta-openembedded git repository with the proper branch ready.  
     git clone git://git.openembedded.org/meta-openembedded
 
-3/ Clone meta-qt5 git repository with the proper branch ready. 
+3/ Clone meta-qt5 git repository with the proper branch ready.  
     git clone git://github.com/meta-qt5/meta-qt5.git
 
 4/ Clone meta-atmel layer with the proper branch ready.  
