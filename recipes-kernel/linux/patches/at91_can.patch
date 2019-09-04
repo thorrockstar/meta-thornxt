@@ -1,5 +1,5 @@
---- at91_can.c	2019-03-04 00:21:29.000000000 +0100
-+++ _at91_can.c	2019-09-04 20:53:25.191386316 +0200
+--- a/drivers/net/can/at91_can.c
++++ b/drivers/net/can/at91_can.c
 @@ -15,6 +15,7 @@
  #include <linux/if_arp.h>
  #include <linux/interrupt.h>
@@ -135,33 +135,31 @@
  	}
  
  	return received;
-@@ -769,57 +799,44 @@
+@@ -769,57 +799,26 @@
  	}
  }
  
 -static int at91_poll_err(struct net_device *dev, int quota, u32 reg_sr)
-+static int at91_poll_err(struct net_device *dev, u32 reg_sr)
- {
- 	struct sk_buff *skb;
- 	struct can_frame *cf;
- 
+-{
+-	struct sk_buff *skb;
+-	struct can_frame *cf;
+-
 -	if (quota == 0)
 -		return 0;
 -
- 	skb = alloc_can_err_skb(dev, &cf);
- 	if (unlikely(!skb))
- 		return 0;
- 
- 	at91_poll_err_frame(dev, cf, reg_sr);
-+    at91_rx_fifo_in(dev, skb);
- 
- 	dev->stats.rx_packets++;
- 	dev->stats.rx_bytes += cf->can_dlc;
+-	skb = alloc_can_err_skb(dev, &cf);
+-	if (unlikely(!skb))
+-		return 0;
+-
+-	at91_poll_err_frame(dev, cf, reg_sr);
+-
+-	dev->stats.rx_packets++;
+-	dev->stats.rx_bytes += cf->can_dlc;
 -	netif_receive_skb(skb);
- 
- 	return 1;
- }
- 
+-
+-	return 1;
+-}
+-
 -static int at91_poll(struct napi_struct *napi, int quota)
 +static int at91_napi_poll(struct napi_struct *napi, int quota)
  {
@@ -212,7 +210,7 @@
  /*
   * theory of operation:
   *
-@@ -871,8 +888,8 @@
+@@ -871,8 +870,8 @@
  	 * we get a TX int for the last can frame directly before a
  	 * wrap around.
  	 */
@@ -223,7 +221,7 @@
  		netif_wake_queue(dev);
  }
  
-@@ -1062,8 +1079,7 @@
+@@ -1062,8 +1061,7 @@
  {
  	struct net_device *dev = dev_id;
  	struct at91_priv *priv = netdev_priv(dev);
@@ -233,7 +231,7 @@
  
  	reg_sr = at91_read(priv, AT91_SR);
  	reg_imr = at91_read(priv, AT91_IMR);
-@@ -1071,19 +1087,26 @@
+@@ -1071,19 +1069,26 @@
  	/* Ignore masked interrupts */
  	reg_sr &= reg_imr;
  	if (!reg_sr)
@@ -266,7 +264,7 @@
  		napi_schedule(&priv->napi);
  	}
  
-@@ -1093,8 +1116,7 @@
+@@ -1093,8 +1098,7 @@
  
  	at91_irq_err(dev);
  
@@ -276,7 +274,7 @@
  }
  
  static int at91_open(struct net_device *dev)
-@@ -1334,7 +1356,14 @@
+@@ -1334,7 +1338,14 @@
  	priv->pdata = dev_get_platdata(&pdev->dev);
  	priv->mb0_id = 0x7ff;
  
