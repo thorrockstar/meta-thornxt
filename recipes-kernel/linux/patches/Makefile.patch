@@ -1,6 +1,6 @@
 --- a/sound/soc/atmel/Makefile	2016-08-06 00:13:52.275443000 +0200
 +++ b/sound/soc/atmel/Makefile	2016-08-14 13:16:30.865475934 +0200
-@@ -12,12 +12,14 @@
+@@ -13,6 +13,7 @@
  # AT91 Machine Support
  snd-soc-sam9g20-wm8731-objs := sam9g20_wm8731.o
  snd-atmel-soc-wm8904-objs := atmel_wm8904.o
@@ -8,6 +8,7 @@
  snd-soc-sam9x5-wm8731-objs := sam9x5_wm8731.o
  snd-atmel-soc-classd-objs := atmel-classd.o
  snd-atmel-soc-pdmic-objs := atmel-pdmic.o
+@@ -21,6 +22,7 @@
  
  obj-$(CONFIG_SND_AT91_SOC_SAM9G20_WM8731) += snd-soc-sam9g20-wm8731.o
  obj-$(CONFIG_SND_ATMEL_SOC_WM8904) += snd-atmel-soc-wm8904.o

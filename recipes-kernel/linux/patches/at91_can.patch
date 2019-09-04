@@ -1,5 +1,5 @@
---- a/drivers/net/can/at91_can.c
-+++ b/drivers/net/can/at91_can.c
+--- at91_can.c	2019-03-04 00:21:29.000000000 +0100
++++ _at91_can.c	2019-09-04 20:53:25.191386316 +0200
 @@ -15,6 +15,7 @@
  #include <linux/if_arp.h>
  #include <linux/interrupt.h>
@@ -8,7 +8,7 @@
  #include <linux/module.h>
  #include <linux/netdevice.h>
  #include <linux/of.h>
-@@ -142,6 +143,18 @@ struct at91_priv {
+@@ -142,6 +143,18 @@
  	struct at91_can_data *pdata;
  
  	canid_t mb0_id;
@@ -27,7 +27,7 @@
  };
  
  static const struct at91_devtype_data at91_at91sam9263_data = {
-@@ -408,7 +421,8 @@ static void at91_chip_start(struct net_device *dev)
+@@ -408,7 +421,8 @@
  	priv->can.state = CAN_STATE_ERROR_ACTIVE;
  
  	/* Enable interrupts */
@@ -37,7 +37,7 @@
  	at91_write(priv, AT91_IDR, AT91_IRQ_ALL);
  	at91_write(priv, AT91_IER, reg_ier);
  }
-@@ -427,6 +441,28 @@ static void at91_chip_stop(struct net_device *dev, enum can_state state)
+@@ -427,6 +441,28 @@
  	priv->can.state = state;
  }
  
@@ -66,7 +66,7 @@
  /*
   * theory of operation:
   *
-@@ -557,9 +593,10 @@ static void at91_rx_overflow_err(struct net_device *dev)
+@@ -557,9 +593,10 @@
  	cf->can_id |= CAN_ERR_CRTL;
  	cf->data[1] = CAN_ERR_CRTL_RX_OVERFLOW;
  
@@ -78,7 +78,7 @@
  }
  
  /**
-@@ -621,10 +658,10 @@ static void at91_read_msg(struct net_device *dev, unsigned int mb)
+@@ -621,10 +658,10 @@
  	}
  
  	at91_read_mb(dev, mb, cf);
@@ -90,7 +90,7 @@
  
  	can_led_event(dev, CAN_LED_EVENT_RX);
  }
-@@ -678,7 +715,7 @@ static void at91_read_msg(struct net_device *dev, unsigned int mb)
+@@ -678,7 +715,7 @@
   * quota.
   *
   */
@@ -99,7 +99,7 @@
  {
  	struct at91_priv *priv = netdev_priv(dev);
  	u32 reg_sr = at91_read(priv, AT91_SR);
-@@ -686,14 +723,9 @@ static int at91_poll_rx(struct net_device *dev, int quota)
+@@ -686,14 +723,9 @@
  	unsigned int mb;
  	int received = 0;
  
@@ -112,11 +112,11 @@
 +again:
  	for (mb = find_next_bit(addr, get_mb_tx_first(priv), priv->rx_next);
 -	     mb < get_mb_tx_first(priv) && quota > 0;
-+         mb < get_mb_tx_first(priv);
++	     mb < get_mb_tx_first(priv);
  	     reg_sr = at91_read(priv, AT91_SR),
  	     mb = find_next_bit(addr, get_mb_tx_first(priv), ++priv->rx_next)) {
  		at91_read_msg(dev, mb);
-@@ -707,14 +739,14 @@ static int at91_poll_rx(struct net_device *dev, int quota)
+@@ -707,15 +739,13 @@
  			at91_activate_rx_mb(priv, mb);
  
  		received++;
@@ -128,14 +128,14 @@
 -	    mb > get_mb_rx_last(priv)) {
 +	if ((priv->rx_next > get_mb_rx_low_last(priv)) &&
 +        (mb > get_mb_rx_last(priv))) {
-+
  		priv->rx_next = get_mb_rx_first(priv);
 -		if (quota > 0)
-+
- 			goto again;
+-			goto again;
++		goto again;
  	}
  
-@@ -769,36 +801,32 @@ static void at91_poll_err_frame(struct net_device *dev,
+ 	return received;
+@@ -769,57 +799,44 @@
  	}
  }
  
@@ -163,39 +163,32 @@
  }
  
 -static int at91_poll(struct napi_struct *napi, int quota)
-+static void at91_poll(struct net_device *dev)
++static int at91_napi_poll(struct napi_struct *napi, int quota)
  {
 -	struct net_device *dev = napi->dev;
- 	const struct at91_priv *priv = netdev_priv(dev);
- 	u32 reg_sr = at91_read(priv, AT91_SR);
+-	const struct at91_priv *priv = netdev_priv(dev);
+-	u32 reg_sr = at91_read(priv, AT91_SR);
 -	int work_done = 0;
-+    u32 reg_ier;
- 
- 	if (reg_sr & get_irq_mb_rx(priv))
--		work_done += at91_poll_rx(dev, quota - work_done);
-+        at91_poll_rx(dev);
- 
- 	/*
- 	 * The error bits are clear on read,
-@@ -806,17 +834,30 @@ static int at91_poll(struct napi_struct *napi, int quota)
- 	 */
- 	reg_sr |= priv->reg_sr;
- 	if (reg_sr & AT91_IRQ_ERR_FRAME)
--		work_done += at91_poll_err(dev, quota - work_done, reg_sr);
-+        at91_poll_err(dev, reg_sr);
- 
--	if (work_done < quota) {
- 		/* enable IRQs for frame errors and all mailboxes >= rx_next */
--		u32 reg_ier = AT91_IRQ_ERR_FRAME;
-+    reg_ier = AT91_IRQ_ERR_FRAME;
- 		reg_ier |= get_irq_mb_rx(priv) & ~AT91_MB_MASK(priv->rx_next);
 -
--		napi_complete(napi);
- 		at91_write(priv, AT91_IER, reg_ier);
-+}
-+
-+static int at91_napi_poll(struct napi_struct *napi, int quota)
-+{
+-	if (reg_sr & get_irq_mb_rx(priv))
+-		work_done += at91_poll_rx(dev, quota - work_done);
+-
+-	/*
+-	 * The error bits are clear on read,
+-	 * so use saved value from irq handler.
+-	 */
+-	reg_sr |= priv->reg_sr;
+-	if (reg_sr & AT91_IRQ_ERR_FRAME)
+-		work_done += at91_poll_err(dev, quota - work_done, reg_sr);
+-
+-	if (work_done < quota) {
+-		/* enable IRQs for frame errors and all mailboxes >= rx_next */
+-		u32 reg_ier = AT91_IRQ_ERR_FRAME;
+-		reg_ier |= get_irq_mb_rx(priv) & ~AT91_MB_MASK(priv->rx_next);
+-
+-		napi_complete_done(napi, work_done);
+-		at91_write(priv, AT91_IER, reg_ier);
+-	}
 +    struct net_device *dev = napi->dev;
 +    const struct at91_priv *priv = netdev_priv(dev);
 +    int work_done = 0;
@@ -205,15 +198,21 @@
 +        at91_rx_fifo_out(dev, &skb);
 +        netif_receive_skb(skb);
 +        work_done++;
- 	}
- 
-+    if(work_done < quota)
++ 	}
++ 
++    if(work_done < quota) {
 +        napi_complete(napi);
-+
- 	return work_done;
- }
++    }
  
-@@ -871,8 +912,8 @@ static void at91_irq_tx(struct net_device *dev, u32 reg_sr)
+-	return work_done;
++ 	return work_done;
+ }
+-
++ 
+ /*
+  * theory of operation:
+  *
+@@ -871,8 +888,8 @@
  	 * we get a TX int for the last can frame directly before a
  	 * wrap around.
  	 */
@@ -224,30 +223,31 @@
  		netif_wake_queue(dev);
  }
  
-@@ -1062,7 +1103,6 @@ static irqreturn_t at91_irq(int irq, void *dev_id)
+@@ -1062,8 +1079,7 @@
  {
  	struct net_device *dev = dev_id;
  	struct at91_priv *priv = netdev_priv(dev);
 -	irqreturn_t handled = IRQ_NONE;
- 	u32 reg_sr, reg_imr;
+-	u32 reg_sr, reg_imr;
++	u32 reg_sr, reg_imr, reg_rxe;
  
  	reg_sr = at91_read(priv, AT91_SR);
-@@ -1071,19 +1111,28 @@ static irqreturn_t at91_irq(int irq, void *dev_id)
+ 	reg_imr = at91_read(priv, AT91_IMR);
+@@ -1071,19 +1087,26 @@
  	/* Ignore masked interrupts */
  	reg_sr &= reg_imr;
  	if (!reg_sr)
 -		goto exit;
 +		return IRQ_NONE;
-+
-+	/* Receive or error interrupt? -> put in rx_fifo and call napi */
  
 -	handled = IRQ_HANDLED;
-+    //u32 reg_rxe = (get_irq_mb_rx(priv) | AT91_IRQ_ERR_FRAME);
-+    u32 reg_rxe = get_irq_mb_rx(priv);
++    /* Receive or error interrupt? -> put in rx_fifo and call napi */
  
 -	/* Receive or error interrupt? -> napi */
 -	if (reg_sr & (get_irq_mb_rx(priv) | AT91_IRQ_ERR_FRAME)) {
-+	if (reg_sr & reg_rxe) {
++    reg_rxe = get_irq_mb_rx(priv);
++
++    if (reg_sr & reg_rxe) {
  		/*
  		 * The error bits are clear on read,
  		 * save for later use.
@@ -257,7 +257,6 @@
 -			   get_irq_mb_rx(priv) | AT91_IRQ_ERR_FRAME);
 +		at91_write(priv, AT91_IDR, reg_rxe);
 +
-+        //at91_poll(dev);
 +        at91_poll_rx(dev);
 +
 +        /* enable IRQs for all mailboxes >= rx_next */
@@ -267,17 +266,17 @@
  		napi_schedule(&priv->napi);
  	}
  
-@@ -1093,8 +1142,7 @@ static irqreturn_t at91_irq(int irq, void *dev_id)
+@@ -1093,8 +1116,7 @@
  
  	at91_irq_err(dev);
  
 - exit:
 -	return handled;
-+	return IRQ_HANDLED;
++    return IRQ_HANDLED;
  }
  
  static int at91_open(struct net_device *dev)
-@@ -1335,7 +1383,14 @@ static int at91_can_probe(struct platform_device *pdev)
+@@ -1334,7 +1356,14 @@
  	priv->pdata = dev_get_platdata(&pdev->dev);
  	priv->mb0_id = 0x7ff;
  
