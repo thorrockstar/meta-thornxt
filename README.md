@@ -51,19 +51,19 @@ Build procedure
     cd poky
 
 1/ Clone yocto/poky git repository with the proper branch ready.  
-    git clone git://git.yoctoproject.org/poky -b rocko
+    git clone git://git.yoctoproject.org/poky -b warrior
 
 2/ Clone meta-openembedded git repository with the proper branch ready.  
-    git clone git://git.openembedded.org/meta-openembedded -b rocko
+    git clone git://git.openembedded.org/meta-openembedded -b warrior
 
 3/ Clone meta-qt5 git repository with the proper branch ready. 
-    git clone git://github.com/meta-qt5/meta-qt5.git -b rocko
+    git clone git://github.com/meta-qt5/meta-qt5.git -b warrior
 
 4/ Clone meta-atmel layer with the proper branch ready.  
-    git clone git://github.com/linux4sam/meta-atmel.git -b rocko
+    git clone git://github.com/linux4sam/meta-atmel.git -b warrior
 
 5/ Clone meta-thornxt layer with the proper branch ready.  
-    git clone git://github.com/thorrockstar/meta-thornxt.git -b rocko
+    git clone git://github.com/thorrockstar/meta-thornxt.git -b warrior
 
 6/ Enter the poky directory to configure the build system and start the build process.  
    cd poky
@@ -134,13 +134,13 @@ Typical bitbake output
     TARGET_FPU           = "hard"
     meta                 
     meta-poky            
-    meta-yocto-bsp       = "rocko:9ed1178c87afce997d5a21cadae7461fb6bb48da"
-    meta-atmel           = "rocko:d77d8716376781aab08cb68fdc68361e6feeb154"
-    meta-thornxt         = "rocko:c31f1c50664d7539d6a551d25e5768737494548b"
+    meta-yocto-bsp       = "warrior:9ed1178c87afce997d5a21cadae7461fb6bb48da"
+    meta-atmel           = "warrior:d77d8716376781aab08cb68fdc68361e6feeb154"
+    meta-thornxt         = "warrior:c31f1c50664d7539d6a551d25e5768737494548b"
     meta-oe              
     meta-networking      
-    meta-python          = "rocko:352531015014d1957d6444d114f4451e241c4d23"
-    meta-qt5             = "rocko:682ad61c071a9710e9f9d8a32ab1b5f3c14953d1"
+    meta-python          = "warrior:352531015014d1957d6444d114f4451e241c4d23"
+    meta-qt5             = "warrior:682ad61c071a9710e9f9d8a32ab1b5f3c14953d1"
 
 Note/Issues
 ===========
