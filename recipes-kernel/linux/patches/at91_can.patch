@@ -116,7 +116,7 @@
  	     reg_sr = at91_read(priv, AT91_SR),
  	     mb = find_next_bit(addr, get_mb_tx_first(priv), ++priv->rx_next)) {
  		at91_read_msg(dev, mb);
-@@ -707,15 +739,13 @@
+@@ -707,119 +739,38 @@
  			at91_activate_rx_mb(priv, mb);
  
  		received++;
@@ -135,10 +135,56 @@
  	}
  
  	return received;
-@@ -769,57 +799,26 @@
- 	}
  }
  
+-static void at91_poll_err_frame(struct net_device *dev,
+-		struct can_frame *cf, u32 reg_sr)
+-{
+-	struct at91_priv *priv = netdev_priv(dev);
+-
+-	/* CRC error */
+-	if (reg_sr & AT91_IRQ_CERR) {
+-		netdev_dbg(dev, "CERR irq\n");
+-		dev->stats.rx_errors++;
+-		priv->can.can_stats.bus_error++;
+-		cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR;
+-	}
+-
+-	/* Stuffing Error */
+-	if (reg_sr & AT91_IRQ_SERR) {
+-		netdev_dbg(dev, "SERR irq\n");
+-		dev->stats.rx_errors++;
+-		priv->can.can_stats.bus_error++;
+-		cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR;
+-		cf->data[2] |= CAN_ERR_PROT_STUFF;
+-	}
+-
+-	/* Acknowledgement Error */
+-	if (reg_sr & AT91_IRQ_AERR) {
+-		netdev_dbg(dev, "AERR irq\n");
+-		dev->stats.tx_errors++;
+-		cf->can_id |= CAN_ERR_ACK;
+-	}
+-
+-	/* Form error */
+-	if (reg_sr & AT91_IRQ_FERR) {
+-		netdev_dbg(dev, "FERR irq\n");
+-		dev->stats.rx_errors++;
+-		priv->can.can_stats.bus_error++;
+-		cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR;
+-		cf->data[2] |= CAN_ERR_PROT_FORM;
+-	}
+-
+-	/* Bit Error */
+-	if (reg_sr & AT91_IRQ_BERR) {
+-		netdev_dbg(dev, "BERR irq\n");
+-		dev->stats.tx_errors++;
+-		priv->can.can_stats.bus_error++;
+-		cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR;
+-		cf->data[2] |= CAN_ERR_PROT_BIT;
+-	}
+-}
+-
 -static int at91_poll_err(struct net_device *dev, int quota, u32 reg_sr)
 -{
 -	struct sk_buff *skb;
@@ -170,7 +216,21 @@
 -
 -	if (reg_sr & get_irq_mb_rx(priv))
 -		work_done += at91_poll_rx(dev, quota - work_done);
--
++    struct net_device *dev = napi->dev;
++    const struct at91_priv *priv = netdev_priv(dev);
++    int work_done = 0;
++    struct sk_buff *skb = NULL;
++
++    while(!(kfifo_is_empty(&priv->rx_fifo)) && (work_done < quota)) {
++        at91_rx_fifo_out(dev, &skb);
++        netif_receive_skb(skb);
++        work_done++;
++ 	}
++ 
++    if(work_done < quota) {
++        napi_complete(napi);
++    }
+ 
 -	/*
 -	 * The error bits are clear on read,
 -	 * so use saved value from irq handler.
@@ -187,21 +247,7 @@
 -		napi_complete_done(napi, work_done);
 -		at91_write(priv, AT91_IER, reg_ier);
 -	}
-+    struct net_device *dev = napi->dev;
-+    const struct at91_priv *priv = netdev_priv(dev);
-+    int work_done = 0;
-+    struct sk_buff *skb = NULL;
-+
-+    while(!(kfifo_is_empty(&priv->rx_fifo)) && (work_done < quota)) {
-+        at91_rx_fifo_out(dev, &skb);
-+        netif_receive_skb(skb);
-+        work_done++;
-+ 	}
-+ 
-+    if(work_done < quota) {
-+        napi_complete(napi);
-+    }
- 
+-
 -	return work_done;
 + 	return work_done;
  }
@@ -210,7 +256,7 @@
  /*
   * theory of operation:
   *
-@@ -871,8 +870,8 @@
+@@ -871,8 +822,8 @@
  	 * we get a TX int for the last can frame directly before a
  	 * wrap around.
  	 */
@@ -221,7 +267,7 @@
  		netif_wake_queue(dev);
  }
  
-@@ -1062,8 +1061,7 @@
+@@ -1062,8 +1013,7 @@
  {
  	struct net_device *dev = dev_id;
  	struct at91_priv *priv = netdev_priv(dev);
@@ -231,7 +277,7 @@
  
  	reg_sr = at91_read(priv, AT91_SR);
  	reg_imr = at91_read(priv, AT91_IMR);
-@@ -1071,19 +1069,26 @@
+@@ -1071,19 +1021,26 @@
  	/* Ignore masked interrupts */
  	reg_sr &= reg_imr;
  	if (!reg_sr)
@@ -264,7 +310,7 @@
  		napi_schedule(&priv->napi);
  	}
  
-@@ -1093,8 +1098,7 @@
+@@ -1093,8 +1050,7 @@
  
  	at91_irq_err(dev);
  
@@ -274,7 +320,7 @@
  }
  
  static int at91_open(struct net_device *dev)
-@@ -1334,7 +1338,14 @@
+@@ -1334,7 +1290,14 @@
  	priv->pdata = dev_get_platdata(&pdev->dev);
  	priv->mb0_id = 0x7ff;
  
