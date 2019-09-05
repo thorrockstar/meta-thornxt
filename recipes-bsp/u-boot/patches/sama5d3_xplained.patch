@@ -1,6 +1,6 @@
 --- a/board/atmel/sama5d3_xplained/sama5d3_xplained.c
 +++ b/board/atmel/sama5d3_xplained/sama5d3_xplained.c
-@@ -14,11 +14,4292 @@
+@@ -13,11 +13,4291 @@
  #include <asm/arch/clk.h>
  #include <debug_uart.h>
  #include <spl.h>
@@ -87,7 +87,6 @@
 +    1,ILI9341_SWRESET,  /* Software reset */
 +    3,0x00,             /* Delay long */
 +    1,ILI9341_DISPOFF,  /* Display off */
-+    //2,0x00,             /* Delay short */
 +    
 +    1,ILI9341_PWRCTRB,  0,0x00, 0,0xC1, 0,0x30,
 +    1,ILI9341_PWRSQCTR, 0,0x64, 0,0x03, 0,0x12, 0,0x81,
@@ -4290,10 +4289,10 @@
 +	return 0;
 +}
 +
+ extern void at91_pda_detect(void);
+ 
  #ifdef CONFIG_NAND_ATMEL
- void sama5d3_xplained_nand_hw_init(void)
- {
-@@ -59,13 +4340,6 @@ static void sama5d3_xplained_usb_hw_init(void)
+@@ -60,13 +4340,6 @@
  }
  #endif
  
@@ -4307,13 +4306,13 @@
  #ifdef CONFIG_DEBUG_UART_BOARD_INIT
  void board_debug_uart_init(void)
  {
-@@ -91,11 +4365,21 @@ int board_init(void)
+@@ -100,12 +4373,19 @@
  #ifdef CONFIG_NAND_ATMEL
  	sama5d3_xplained_nand_hw_init();
  #endif
 +
 +#ifdef CONFIG_LCD
-+       thor_lcd_hw_init();
++    thor_lcd_hw_init();
 +#endif /* ifdef CONFIG_LCD */
 +
 +#ifdef CONFIG_ATMEL_SPI
@@ -4324,9 +4323,19 @@
  #ifdef CONFIG_CMD_USB
  	sama5d3_xplained_usb_hw_init();
  #endif
- #ifdef CONFIG_GENERIC_ATMEL_MCI
+-#ifdef CONFIG_GENERIC_ATMEL_MCI
 -	sama5d3_xplained_mci0_hw_init();
-+	//sama5d3_xplained_mci0_hw_init();
- #endif
+-#endif
  	return 0;
  }
+ 
+@@ -122,9 +4402,6 @@
+ void spl_board_init(void)
+ {
+ #ifdef CONFIG_SD_BOOT
+-#ifdef CONFIG_GENERIC_ATMEL_MCI
+-	sama5d3_xplained_mci0_hw_init();
+-#endif
+ #elif CONFIG_NAND_BOOT
+ 	sama5d3_xplained_nand_hw_init();
+ #endif
