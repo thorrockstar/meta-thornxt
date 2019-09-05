@@ -1,9 +1,9 @@
 --- a/include/configs/at91-sama5_common.h
 +++ b/include/configs/at91-sama5_common.h
-@@ -81,7 +81,7 @@
- #ifdef CONFIG_SYS_USE_NANDFLASH
+@@ -57,7 +57,7 @@
+ 
+ #ifdef CONFIG_NAND_BOOT
  /* u-boot env in nand flash */
- #define CONFIG_ENV_IS_IN_NAND
 -#define CONFIG_ENV_OFFSET		0x140000
 +#define CONFIG_ENV_OFFSET		0xc0000
  #define CONFIG_ENV_OFFSET_REDUND	0x100000
