@@ -150,11 +150,11 @@
 +
 +    /* Set actual MCK used (BCLK == MCLK). */
 +
-+    ret = snd_soc_component_set_sysclk(rtd->component, SSM2518_SYSCLK, SSM2518_SYSCLK_SRC_BCLK, targetMCLK, SND_SOC_CLOCK_IN);
++    ret = snd_soc_component_set_sysclk(rtd->codec_dai->component, SSM2518_SYSCLK, SSM2518_SYSCLK_SRC_BCLK, targetMCLK, SND_SOC_CLOCK_IN);
 +
 +    if (ret < 0)
 +    {
-+        printk(KERN_ALERT "DEBUG: snd_soc_component_set_sysclk(rtd->component, ...) failed, passed %s %d\n",__FUNCTION__,__LINE__);
++        printk(KERN_ALERT "DEBUG: snd_soc_component_set_sysclk(rtd->codec_dai->component, ...) failed, passed %s %d\n",__FUNCTION__,__LINE__);
 +    }
 +
 +    return(0);
@@ -177,11 +177,11 @@
 +
 +    if (rtd)
 +    {
-+        ierr = snd_soc_component_set_sysclk(rtd->component, SSM2518_SYSCLK, SSM2518_SYSCLK_SRC_BCLK, 4096000, SND_SOC_CLOCK_IN);
++        ierr = snd_soc_component_set_sysclk(rtd->codec_dai->component, SSM2518_SYSCLK, SSM2518_SYSCLK_SRC_BCLK, 4096000, SND_SOC_CLOCK_IN);
 +
 +        if (ierr < 0)
 +        {
-+            printk(KERN_ALERT "DEBUG: snd_soc_component_set_sysclk(rtd->component, ...) failed, passed %s %d\n",__FUNCTION__,__LINE__);
++            printk(KERN_ALERT "DEBUG: snd_soc_component_set_sysclk(rtd->codec_dai->component, ...) failed, passed %s %d\n",__FUNCTION__,__LINE__);
 +        }
 +
 +        ierr = snd_soc_dai_set_tdm_slot(rtd->codec_dai, 0x03 /*TX always 2 bits set*/, 0x00 /*RX always 0*/, 8 /*slots TDM8*/, 32 /*bit width*/ );
