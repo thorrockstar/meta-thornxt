@@ -89,7 +89,6 @@ Build procedure
       ${BSPDIR}/meta-openembedded/meta-oe \
       ${BSPDIR}/meta-openembedded/meta-networking \
       ${BSPDIR}/meta-openembedded/meta-python \
-      ${BSPDIR}/meta-qt5 \
       "
     
     BLAYERS_NON_REMOVABLE ?= " \
@@ -123,55 +122,23 @@ This should be done by the 'defconfig' but double check before building because 
 Typical bitbake output
 ======================
     Build Configuration:
-    BB_VERSION           = "1.36.0"
+    BB_VERSION           = "1.42.0"
     BUILD_SYS            = "i686-linux"
-    NATIVELSBSTRING      = "ubuntu-16.04"
+    NATIVELSBSTRING      = "universal"
     TARGET_SYS           = "arm-poky-linux-gnueabi"
     MACHINE              = "sama5d3-xplained"
     DISTRO               = "poky-atmel"
-    DISTRO_VERSION       = "2.4.3"
-    TUNE_FEATURES        = "arm armv7a vfp thumb callconvention-hard cortexa5"
+    DISTRO_VERSION       = "2.7.1"
+    TUNE_FEATURES        = "arm vfp cortexa5 thumb callconvention-hard"
     TARGET_FPU           = "hard"
     meta                 
     meta-poky            
-    meta-yocto-bsp       = "warrior:9ed1178c87afce997d5a21cadae7461fb6bb48da"
-    meta-atmel           = "warrior:d77d8716376781aab08cb68fdc68361e6feeb154"
-    meta-thornxt         = "warrior:c31f1c50664d7539d6a551d25e5768737494548b"
+    meta-yocto-bsp       = "warrior:01b8a8b54bc569e5ef3f5e6fc6abcee365ab25d9"
+    meta-atmel           = "warrior:68e3f6e2a9965c79beb426663c043b3d54b54555"
+    meta-thornxt         = "warrior:b6877e12a43290637cface397d3d5f5423c56f83"
     meta-oe              
     meta-networking      
-    meta-python          = "warrior:352531015014d1957d6444d114f4451e241c4d23"
-    meta-qt5             = "warrior:682ad61c071a9710e9f9d8a32ab1b5f3c14953d1"
-
-Note/Issues
-===========
-
-You may encounter the problem that after bulding the image 'newusers' and 'chpassw' gives you an error in the way of:
-
-    root@sama5d3-xplained:~# newusers
-    newusers: PAM: Authentication failure
-    root@sama5d3-xplained:~# chpasswd
-    chpasswd: PAM: Authentication failure
-
-To fix this you will need this patch that modifies the shadow files in the 'meta/recipes-extended/shadow/files/pam.d' folder before building the Yocto image.
-
-     --- a/meta/recipes-extended/shadow/files/pam.d/chpasswd
-     +++ b/meta/recipes-extended/shadow/files/pam.d/chpasswd
-     @@ -1,4 +1,6 @@
-     # The PAM configuration file for the Shadow 'chpasswd' service
-     #
-     +auth       sufficient   pam_rootok.so
-     +account    required     pam_permit.so
-      password   include      common-password
-
-
-     --- a/meta/recipes-extended/shadow/files/pam.d/newusers
-     +++ b/meta/recipes-extended/shadow/files/pam.d/newusers
-     @@ -1,4 +1,6 @@
-      # The PAM configuration file for the Shadow 'newusers' service
-      #
-     +auth       sufficient   pam_rootok.so
-     +account    required     pam_permit.so
-      password   include      common-password
+    meta-python          = "warrior:0afee3eacfd18a9962013830028f9e54b4973657"
 
 Contributing
 ============
