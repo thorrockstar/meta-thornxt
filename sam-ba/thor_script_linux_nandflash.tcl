@@ -92,7 +92,7 @@ set pmeccConfig 0xc0902405
 
 ## NandFlash Mapping
 set bootStrapAddr	0x00000000
-set ubootAddr		0x00020000
+set ubootAddr		0x00010000
 set ubootEnvAddr	0x000c0000
 set dtbAddr			0x00180000
 set kernelAddr		0x00200000
@@ -116,7 +116,7 @@ lappend u_boot_variables \
     "stderr=serial" \
 	"ipaddr=192.168.178.142" \
 	"netmask=255.255.255.0" \
-    "bootargs=console=ttyS0,115200 mtdparts=atmel_nand:128k(bootstrap)ro,640k(uboot)ro,256k(env),256k(env_redundant),256k(spare),512k(dtb),6M(kernel)ro,-(rootfs) rootfstype=ubifs ubi.mtd=7 root=ubi0:rootfs rw" \
+    "bootargs=console=ttyS0,115200 mtdparts=atmel_nand:64k(bootstrap)ro,704k(uboot)ro,256k(env),256k(env_redundant),256k(spare),512k(dtb),6M(kernel)ro,-(rootfs) rootfstype=ubifs ubi.mtd=7 root=ubi0:rootfs rw" \
     "$bootCmd"
 
 
