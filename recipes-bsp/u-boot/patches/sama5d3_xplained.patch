@@ -3886,7 +3886,7 @@
 +
 +    /* Init SPI. */
 +    
-+    spi_init();
++    //spi_init();
 +    
 +    /* Setup SPI. */
 +    
