@@ -1,6 +1,6 @@
 --- a/net/eth_legacy.c
 +++ b/net/eth_legacy.c
-@@ -257,8 +257,8 @@ int eth_initialize(void)
+@@ -256,8 +256,8 @@
  	}
  
  	if (!eth_devices) {
@@ -10,4 +10,4 @@
 +		//bootstage_error(BOOTSTAGE_ID_NET_ETH_START);
  	} else {
  		struct eth_device *dev = eth_devices;
- 		char *ethprime = getenv("ethprime");
+ 		char *ethprime = env_get("ethprime");
