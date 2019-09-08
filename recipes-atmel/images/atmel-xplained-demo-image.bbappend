@@ -57,3 +57,10 @@ IMAGE_INSTALL_append = "\
     ca-certificates \
 	"
 
+ROOTFS_POSTPROCESS_COMMAND += " fix_udev_files ; "
+
+fix_udev_files () {
+    rm -f $D${sysconfdir}/udev/hwdb.bin
+    rm -fr $D${sysconfdir}/udev/hwdb.d
+}
+
