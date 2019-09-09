@@ -57,7 +57,9 @@ IMAGE_INSTALL_append = "\
     ca-certificates \
 	"
 
-ROOTFS_POSTPROCESS_COMMAND += " fix_udev_files ; fix_usr_files ; fix_firmware_files ; "
+CUSTOMFILESPATH_EXTRA := "${THISDIR}/files"
+
+ROOTFS_POSTPROCESS_COMMAND += " fix_udev_files ; fix_usr_files ; fix_firmware_files ; fix_interfaces_files ; "
 
 fix_udev_files () {
     rm -f $D${sysconfdir}/udev/hwdb.bin
@@ -76,5 +78,10 @@ fix_usr_files () {
 fix_firmware_files () {
     rm -fr $D/usr/lib/firmware/*
     rm -fr $D/usr/share/sounds/alsa/*.wav
+}
+
+fix_interfaces_files () {
+    install -c -m 0644 ${CUSTOMFILESPATH_EXTRA}/interfaces ${IMAGE_ROOTFS}/etc/network/
+    install -c -m 0644 ${CUSTOMFILESPATH_EXTRA}/inittab ${IMAGE_ROOTFS}/etc/
 }
 
