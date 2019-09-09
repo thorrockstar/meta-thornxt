@@ -57,10 +57,22 @@ IMAGE_INSTALL_append = "\
     ca-certificates \
 	"
 
-ROOTFS_POSTPROCESS_COMMAND += " fix_udev_files ; "
+ROOTFS_POSTPROCESS_COMMAND += " fix_udev_files ; fix_usr_files ; fix_firmware_files ; "
 
 fix_udev_files () {
     rm -f $D${sysconfdir}/udev/hwdb.bin
     rm -fr $D${sysconfdir}/udev/hwdb.d
+}
+
+fix_usr_files () {
+    rm -fr $D/usr/games
+    rm -fr $D/usr/lib/python2.7
+    rm -fr $D/usr/include/python2.7
+    rm -f $D/usr/lib/libpython*.so.*
+}
+
+fix_firmware_files () {
+    rm -fr $D/usr/lib/firmware/*
+    rm -fr $D/usr/share/sounds/alsa/*.wav
 }
 
