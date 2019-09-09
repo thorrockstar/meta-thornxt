@@ -62,6 +62,8 @@ ROOTFS_POSTPROCESS_COMMAND += " fix_udev_files ; fix_usr_files ; fix_firmware_fi
 fix_udev_files () {
     rm -f $D${sysconfdir}/udev/hwdb.bin
     rm -fr $D${sysconfdir}/udev/hwdb.d
+    rm -fr $D${sysconfdir}/rc3.d/S03rng-tools
+    rm -fr $D${sysconfdir}/rc5.d/S03rng-tools
 }
 
 fix_usr_files () {
