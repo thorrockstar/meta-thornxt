@@ -1,8 +1,8 @@
 /*
  * at91-sama5d3_thor-nxt2.dts - Device Tree file for the THOR-NXT reference board.
  *
- *  Copyright (C) 2017 Thor Engineering GmbH,
- *		  2017 Roy Schneider <roy@thor.engineering>
+ *  Copyright (C) 2019 Thor Engineering GmbH,
+ *		  2019 Roy Schneider <roy@thor.engineering>
  *
  * Licensed under GPLv2 or later.
  *
@@ -13,11 +13,11 @@
 #include "sama5d36.dtsi"
 
 / {
-	model = "Atmel SAMA5D3 Xplained";
+	model = "SAMA5D3 Xplained";
 	compatible = "atmel,sama5d3-xplained", "atmel,sama5d3", "atmel,sama5";
 
 	chosen {
-		bootargs = "console=ttyS0,115200";
+		stdout-path = "serial0:115200n8";
 	};
 
 	memory {
@@ -61,7 +61,7 @@
 
 			i2c0: i2c@f0014000 {
 				status = "okay";
-
+				
 				ssm2518: ssm2518@34 {
 					compatible = "adi,ssm2518";
 					reg = <0x34>;
@@ -123,7 +123,7 @@
 				phy-mode = "rgmii";
 				status = "disabled";
 			};
-
+			
 			pwm0: pwm@f002c000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <
@@ -177,15 +177,15 @@
 				status = "okay";
 			};
 
- 			macb1: ethernet@f802c000 {
- 				phy-mode = "rmii";
+			macb1: ethernet@f802c000 {
+				phy-mode = "rmii";
 				#address-cells = <1>;
 				#size-cells = <0>;
- 				status = "okay";
+				status = "okay";
 				ethernet-phy@1 {
 					reg = <0x1>;
 				};
- 			};
+			};
 
 			aes@f8038000 {
 				dmas = <0>, <0>;	/* Do not use DMA for aes */
@@ -231,7 +231,7 @@
 					};
 				};
 			};
-
+			
 			pmc: pmc@fffffc00 {
 				main: mainck {
 					clock-frequency = <12000000>;
@@ -276,43 +276,65 @@
 			};
 		};
 
-		nand0: nand@60000000 {
-			nand-bus-width = <8>;
-			nand-ecc-mode = "hw";
-			atmel,has-pmecc;
-			atmel,pmecc-cap = <4>;
-			atmel,pmecc-sector-size = <512>;
-			nand-on-flash-bbt;
+		ebi: ebi@10000000 {
+			pinctrl-0 = <&pinctrl_ebi_nand_addr>;
+			pinctrl-names = "default";
 			status = "okay";
 
-			at91bootstrap@0 {
-				label = "at91bootstrap";
-				reg = <0x0 0x40000>;
-			};
+			nand_controller: nand-controller {
+				status = "okay";
 
-			bootloader@40000 {
-				label = "bootloader";
-				reg = <0x40000 0x80000>;
-			};
+				nand@3 {
+					reg = <0x3 0x0 0x2>;
+					atmel,rb = <0>;
+					nand-bus-width = <8>;
+					nand-ecc-mode = "hw";
+					nand-ecc-strength = <4>;
+					nand-ecc-step-size = <512>;
+					nand-on-flash-bbt;
+					label = "atmel_nand";
 
-			bootloaderenv@c0000 {
-				label = "bootloader env";
-				reg = <0xc0000 0xc0000>;
-			};
+					partitions {
+						compatible = "fixed-partitions";
+						#address-cells = <1>;
+						#size-cells = <1>;
 
-			dtb@180000 {
-				label = "device tree";
-				reg = <0x180000 0x80000>;
-			};
+						at91bootstrap@0 {
+							label = "at91bootstrap";
+							reg = <0x0 0x10000>;
+						};
 
-			kernel@200000 {
-				label = "kernel";
-				reg = <0x200000 0x600000>;
-			};
+						bootloader@40000 {
+							label = "bootloader";
+							reg = <0x10000 0xc0000>;
+						};
 
-			rootfs@800000 {
-				label = "rootfs";
-				reg = <0x800000 0x0f800000>;
+						bootloaderenvred@100000 {
+							label = "bootloader env redundant";
+							reg = <0x100000 0x40000>;
+						};
+
+						bootloaderenv@140000 {
+							label = "bootloader env";
+							reg = <0x140000 0x40000>;
+						};
+
+						dtb@180000 {
+							label = "device tree";
+							reg = <0x180000 0x80000>;
+						};
+
+						kernel@200000 {
+							label = "kernel";
+							reg = <0x200000 0x600000>;
+						};
+
+						rootfs@800000 {
+							label = "rootfs";
+							reg = <0x800000 0x0f800000>;
+						};
+					};
+				};
 			};
 		};
 
@@ -337,7 +359,7 @@
 		};
 
 	};
-
+	
 	panel: panel {
 		compatible = "eastrising,ertft050", "simple-panel";
 		power-supply = <&panel_reg>;
