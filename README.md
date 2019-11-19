@@ -77,9 +77,9 @@ Build procedure
 
     BBPATH = "${TOPDIR}"
     BBFILES ?= ""
-    
+
     BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../../..')}"
-    
+
     BBLAYERS ?= " \
       ${BSPDIR}/poky/meta \
       ${BSPDIR}/poky/meta-poky \
@@ -91,7 +91,7 @@ Build procedure
       ${BSPDIR}/meta-openembedded/meta-python \
       ${BSPDIR}/meta-qt5 \
       "
-    
+
     BLAYERS_NON_REMOVABLE ?= " \
       ${BSPDIR}/poky/meta \
       ${BSPDIR}/poky/meta-poky \
@@ -118,7 +118,7 @@ has been turned **off** as well as **'General Setup->Timers subsystem->Timer tic
 This should be done by the 'defconfig' but double check before building because it is cruicial.
 
 10/ Build Thor demo images  
-    bitbake atmel-xplained-demo-image
+    bitbake thor-nxt-image
 
 Typical bitbake output
 ======================
