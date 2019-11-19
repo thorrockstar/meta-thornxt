@@ -56,7 +56,7 @@ Build procedure
 2/ Clone meta-openembedded git repository with the proper branch ready.  
     git clone git://git.openembedded.org/meta-openembedded -b warrior
 
-3/ Clone meta-qt5 git repository with the proper branch ready. 
+3/ Clone meta-qt5 git repository with the proper branch ready.
     git clone git://github.com/meta-qt5/meta-qt5.git -b warrior
 
 4/ Clone meta-atmel layer with the proper branch ready.  
@@ -77,9 +77,9 @@ Build procedure
 
     BBPATH = "${TOPDIR}"
     BBFILES ?= ""
-    
+
     BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../../..')}"
-    
+
     BBLAYERS ?= " \
       ${BSPDIR}/poky/meta \
       ${BSPDIR}/poky/meta-poky \
@@ -90,7 +90,7 @@ Build procedure
       ${BSPDIR}/meta-openembedded/meta-networking \
       ${BSPDIR}/meta-openembedded/meta-python \
       "
-    
+
     BLAYERS_NON_REMOVABLE ?= " \
       ${BSPDIR}/poky/meta \
       ${BSPDIR}/poky/meta-poky \
@@ -117,7 +117,7 @@ has been turned **off** as well as **'General Setup->Timers subsystem->Timer tic
 This should be done by the 'defconfig' but double check before building because it is cruicial.
 
 10/ Build Thor demo images  
-    bitbake atmel-xplained-demo-image
+    bitbake thor-nxt-image
 
 Typical bitbake output
 ======================
