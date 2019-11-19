@@ -44,18 +44,19 @@ IMAGE_INSTALL_remove = "\
     gdb \
     btmon \
     tcpdump \
-	"
+    "
 
 # add important components to image
 IMAGE_INSTALL_append = "\
-	glibc \
-	glib-2.0 \
+    glibc \
+    glib-2.0 \
     gnutls \
     zeromq \
+    dbus \
     gdbserver \
     busybox \
     ca-certificates \
-	"
+    "
 
 CUSTOMFILESPATH_EXTRA := "${THISDIR}/files"
 
@@ -66,6 +67,8 @@ fix_udev_files () {
     rm -fr $D${sysconfdir}/udev/hwdb.d
     rm -fr $D${sysconfdir}/rc3.d/S03rng-tools
     rm -fr $D${sysconfdir}/rc5.d/S03rng-tools
+    rm -fr $D${sysconfdir}/rc3.d/S20hostapd
+    rm -fr $D${sysconfdir}/rc5.d/S20hostapd
 }
 
 fix_usr_files () {
