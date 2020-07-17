@@ -44,23 +44,47 @@ IMAGE_INSTALL_remove = "\
     gdb \
     btmon \
     tcpdump \
-	"
+    "
 
 # add important components to image
 IMAGE_INSTALL_append = "\
-	glibc \
-	glib-2.0 \
+    glibc \
+    glib-2.0 \
     gnutls \
     zeromq \
+    dbus \
     gdbserver \
     busybox \
     ca-certificates \
-	"
+    "
 
-ROOTFS_POSTPROCESS_COMMAND += " fix_udev_files ; "
+CUSTOMFILESPATH_EXTRA := "${THISDIR}/files"
+
+ROOTFS_POSTPROCESS_COMMAND += " fix_udev_files ; fix_usr_files ; fix_firmware_files ; fix_interfaces_files ; "
 
 fix_udev_files () {
     rm -f $D${sysconfdir}/udev/hwdb.bin
     rm -fr $D${sysconfdir}/udev/hwdb.d
+    rm -fr $D${sysconfdir}/rc3.d/S03rng-tools
+    rm -fr $D${sysconfdir}/rc5.d/S03rng-tools
+    rm -fr $D${sysconfdir}/rc3.d/S20hostapd
+    rm -fr $D${sysconfdir}/rc5.d/S20hostapd
+}
+
+fix_usr_files () {
+    rm -fr $D/usr/games
+    rm -fr $D/usr/lib/python2.7
+    rm -fr $D/usr/include/python2.7
+    rm -f $D/usr/lib/libpython*.so.*
+}
+
+fix_firmware_files () {
+    rm -fr $D/usr/lib/firmware/*
+    rm -fr $D/usr/share/sounds/alsa/*.wav
+}
+
+fix_interfaces_files () {
+    install -c -m 0644 ${CUSTOMFILESPATH_EXTRA}/interfaces ${IMAGE_ROOTFS}/etc/network/
+    install -c -m 0644 ${CUSTOMFILESPATH_EXTRA}/inittab ${IMAGE_ROOTFS}/etc/
 }
 
