@@ -1,6 +1,6 @@
 # Include Qt4e SDK and tools in the image.
 TOOLCHAIN_HOST_TASK += "nativesdk-packagegroup-qte-toolchain-host"
-TOOLCHAIN_TARGET_TASK += "packagegroup-qte-toolchain-target gnutls gnutls-dev zeromq zeromq-dev"
+TOOLCHAIN_TARGET_TASK += "packagegroup-qte-toolchain-target gnutls gnutls-dev zeromq zeromq-dev alsa-lib alsa-lib-dev"
 
 QTNAME = "qte"
 QT_DIR_NAME = "qtopia"
