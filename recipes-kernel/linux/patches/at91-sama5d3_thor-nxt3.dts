@@ -361,7 +361,7 @@
 	};
 	
 	panel: panel {
-		compatible = "eastrising,ertft050", "simple-panel";
+		compatible = "hifaycx,rd570", "simple-panel";
 		power-supply = <&panel_reg>;
 		#address-cells = <1>;
 		#size-cells = <0>;
