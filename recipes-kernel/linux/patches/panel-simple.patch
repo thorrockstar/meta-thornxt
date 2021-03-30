@@ -1,6 +1,6 @@
 --- a/drivers/gpu/drm/panel/panel-simple.c
 +++ b/drivers/gpu/drm/panel/panel-simple.c
-@@ -2486,6 +2486,30 @@
+@@ -2486,6 +2486,54 @@
  	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
  };
  
@@ -28,15 +28,42 @@
 +	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
 +};
 +
++static const struct drm_display_mode hifaycx_rd570_mode = {
++	.clock = 33333,
++	.hdisplay = 480,
++	.hsync_start = 480 + 30,
++	.hsync_end = 480 + 30 + 10,
++	.htotal = 480 + 30 + 10 + 30,
++	.vdisplay = 960,
++	.vsync_start = 960 + 16,
++	.vsync_end = 960 + 16 + 8,
++	.vtotal = 960 + 16 + 8 + 8,
++	.vrefresh = 60,
++	.flags = DRM_MODE_FLAG_NVSYNC | DRM_MODE_FLAG_NHSYNC,
++};
++
++static const struct panel_desc hifaycx_rd570 = {
++	.modes = &hifaycx_rd570_mode,
++	.num_modes = 1,
++	.size = {
++		.width = 65,
++		.height = 125,
++	},
++	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
++};
++
  static const struct of_device_id platform_of_match[] = {
  	{
  		.compatible = "ampire,am-480272h3tmqw-t01h",
-@@ -2755,6 +2779,9 @@
+@@ -2755,6 +2779,12 @@
  		.compatible = "winstar,wf35ltiacd",
  		.data = &winstar_wf35ltiacd,
  	}, {
 +		.compatible = "eastrising,ertft050",
 +		.data = &eastrising_ertft050,
++	}, {
++		.compatible = "hifaycx,rd570",
++		.data = &hifaycx_rd570,
 +	}, {
  		/* sentinel */
  	}
