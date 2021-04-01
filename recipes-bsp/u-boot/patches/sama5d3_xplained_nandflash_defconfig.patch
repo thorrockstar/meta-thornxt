@@ -1,15 +1,18 @@
 --- a/configs/sama5d3_xplained_nandflash_defconfig
 +++ b/configs/sama5d3_xplained_nandflash_defconfig
-@@ -17,7 +17,8 @@
+@@ -17,9 +17,10 @@
  CONFIG_NR_DRAM_BANKS=1
  CONFIG_FIT=y
  CONFIG_NAND_BOOT=y
 -CONFIG_BOOTDELAY=3
 +CONFIG_BOOTDELAY=0
-+CONFIG_SYS_USE_NANDFLASH=y
  CONFIG_USE_BOOTARGS=y
- CONFIG_BOOTARGS="console=ttyS0,115200 earlyprintk mtdparts=atmel_nand:256k(bootstrap)ro,768k(uboot)ro,256K(env_redundant),256k(env),512k(dtb),6M(kernel)ro,-(rootfs) rootfstype=ubifs ubi.mtd=6 root=ubi0:rootfs"
+-CONFIG_BOOTARGS="console=ttyS0,115200 earlyprintk mtdparts=atmel_nand:256k(bootstrap)ro,768k(uboot)ro,256K(env_redundant),256k(env),512k(dtb),6M(kernel)ro,-(rootfs) rootfstype=ubifs ubi.mtd=6 root=ubi0:rootfs"
++CONFIG_BOOTARGS="console=ttyS0,115200 mtdparts=atmel_nand:64k(bootstrap)ro,704k(uboot)ro,256k(env),256k(env_redundant),256k(spare),512k(dtb),6M(kernel)ro,-(rootfs) rootfstype=ubifs ubi.mtd=7 root=ubi0:rootfs rw"
++CONFIG_SYS_USE_NANDFLASH=y
  # CONFIG_DISPLAY_BOARDINFO is not set
+ CONFIG_SPL_NAND_SUPPORT=y
+ CONFIG_HUSH_PARSER=y
 @@ -26,18 +27,19 @@
  CONFIG_CMD_BOOTZ=y
  # CONFIG_CMD_FLASH is not set
