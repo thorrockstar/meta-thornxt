@@ -4,18 +4,20 @@
  /*
   * Configuration settings for the SAMA5D3 Xplained board.
   *
-+ * Modified for the THOR NX-T2 board 2019-09-05 by Roy Schneider.
++ * Modified for the THOR NX-T2/3 board 2021-03-31 by Roy Schneider.
 + *
   * Copyright (C) 2014 Atmel Corporation
   *		      Bo Shen <voice.shen@atmel.com>
   */
-@@ -11,6 +13,10 @@
+@@ -11,6 +13,12 @@
  
  #include "at91-sama5_common.h"
  
 +#ifndef CONFIG_CONSOLE_SCROLL_LINES
 +  #define CONFIG_CONSOLE_SCROLL_LINES 5
 +#endif
++
++#define LIFT_APP_THOR_NXT_GENERATION  2  // Define that the Bootloader is made for the NX-T3 generation boards.
 +
  /*
   * This needs to be defined for the OHCI code to work but it is defined as
@@ -24,14 +26,14 @@
  	(CONFIG_SYS_SDRAM_BASE + 16 * 1024 - GENERATED_GBL_DATA_SIZE)
  #endif
  
-+/* SPI for boot picture */
++/* SPI/LCD for boot picture */
 +#define CONFIG_ATMEL_SPI
 +#define CONFIG_ATMEL_HLCD
 +#define CONFIG_LCD
 +#define CONFIG_LCD_INFO
 +#define LCD_BPP LCD_COLOR16
 +#define LCD_OUTPUT_BPP 24
-+#define CONFIG_SYS_WHITE_ON_BLACK
++//#define CONFIG_SYS_WHITE_ON_BLACK
 +
  /* NAND flash */
  #ifdef CONFIG_CMD_NAND

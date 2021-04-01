@@ -1,6 +1,6 @@
 --- a/board/atmel/sama5d3_xplained/sama5d3_xplained.c
 +++ b/board/atmel/sama5d3_xplained/sama5d3_xplained.c
-@@ -13,11 +13,4291 @@
+@@ -13,11 +13,4523 @@
  #include <asm/arch/clk.h>
  #include <debug_uart.h>
  #include <spl.h>
@@ -82,6 +82,165 @@
 +
 +/* Vendor specific initialization command sequence for ILI9341 IC */
 +
++#if LIFT_APP_THOR_NXT_GENERATION==3
++
++const unsigned char at91_spi1_bootpic_init[] =
++{
++       1, 0x01, // Software Reset
++       3, 0x00, // Long delay
++
++       // Display off
++       1, 0x28,
++
++       // Sleep In & Booster off
++       1, 0x10,
++       3, 0x00, // Long delay
++
++       // EXTC Command 'Set page 0 enable register'
++       1, 0xF0, 0, 0x55, 0, 0xAA, 0, 0x52, 0, 0x08, 0, 0x00, // Unlock magic.
++
++       // OTP_CTL
++       1, 0xF6, 0, 0x5A, 0, 0x87,
++
++       //
++       1, 0xC1, 0, 0x3F,
++
++       //
++       1, 0xC2, 0, 0x0E,
++
++       //
++       1, 0xC6, 0, 0xF8,
++
++       //
++       1, 0xC9, 0, 0x10,
++
++       //
++       1, 0xCD, 0, 0x25,
++
++       //
++       1, 0xF8, 0, 0x8A,
++
++       //
++       1, 0xAC, 0, 0x65,
++
++       //
++       1, 0xA7, 0, 0x47,
++
++       // CHP_CTL5
++       1, 0xA0, 0, 0x88,
++
++       //
++       1, 0xFA, 0, 0x02, 0, 0x02, 0, 0x02,
++
++       //
++       1, 0xA3, 0, 0x2E,
++
++       //
++       1, 0xFD, 0, 0x28, 0, 0x3C, 0, 0x00,
++
++       //
++       1, 0x71, 0, 0x48,
++
++       //
++       1, 0x72, 0, 0x48,
++
++       //
++       1, 0x73, 0, 0x00, 0, 0x44,
++
++       //
++       1, 0x97, 0, 0xEE,
++
++       //
++       1, 0x83, 0, 0x93,
++
++       // VREG_CTL4
++       1, 0x9A, 0, 0xB5,
++
++       // VREG_CTL5
++       1, 0x9B, 0, 0x2C,
++
++       // VREG_CTL1
++       1, 0x82, 0, 0x30, 0, 0x30,
++
++       // DISPLAY_CTL
++       1, 0xB1, 0, 0x10,
++
++       //
++       1, 0x7A, 0, 0x13, 0, 0x1A,
++
++       //
++       1, 0x7B, 0, 0x13, 0, 0x1A,
++
++       // CHP_CTL1
++       1, 0x86, 0, 0x99, 0, 0xA3, 0, 0xA3, 0, 0x61,
++
++       //
++       1, 0x6D, 0, 0x00, 0, 0x1D, 0, 0x0A, 0, 0x10, 0, 0x08, 0, 0x1F, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, \
++                0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1E, 0, 0x1F, 0, 0x01, 0, 0x0F, 0, 0x09, 0, 0x1D, 0, 0x00,
++
++       //
++       1, 0x64, 0, 0x18, 0, 0x04, 0, 0x03, 0, 0xC7, 0, 0x03, 0, 0x03, 0, 0x18, 0, 0x03, 0, 0x03, 0, 0xC6, 0, 0x03, 0, 0x03, 0, 0x0B, 0, 0x7A, 0, 0x0B, 0, 0x7A,
++
++       //
++       1, 0x67, 0, 0x18, 0, 0x02, 0, 0x03, 0, 0xC5, 0, 0x03, 0, 0x03, 0, 0x18, 0, 0x01, 0, 0x03, 0, 0xC4, 0, 0x03, 0, 0x03, 0, 0x0B, 0, 0x7A, 0, 0x0B, 0, 0x7A,
++
++       //
++       1, 0x60, 0, 0x18, 0, 0x06, 0, 0x0B, 0, 0x7A, 0, 0x18, 0, 0x02, 0, 0x0B, 0, 0x7A,
++
++       //
++       1, 0x63, 0, 0x18, 0, 0x02, 0, 0x0B, 0, 0x7A, 0, 0x18, 0, 0x05, 0, 0x0B, 0, 0x7A,
++
++       //
++       1, 0x69, 0, 0x14, 0, 0x22, 0, 0x14, 0, 0x22, 0, 0x44, 0, 0x22, 0, 0x08,
++
++       //
++       1, 0xD1, 0, 0x00, 0, 0x00, 0, 0x00, 0, 0x10, 0, 0x00, 0, 0x46, 0, 0x00, 0, 0x5F, 0, 0x00, 0, 0x7B, 0, 0x00, 0, 0xA5, 0, 0x00, 0, 0xC8, 0, 0x00, 0, 0xFF, 0, 0x01, \
++                0, 0x29, 0, 0x01, 0, 0x6E, 0, 0x01, 0, 0xA7, 0, 0x01, 0, 0xFA, 0, 0x02, 0, 0x3D, 0, 0x02, 0, 0x3F, 0, 0x02, 0, 0x7D, 0, 0x02, 0, 0xCA, 0, 0x03, 0, 0x00, \
++                0, 0x03, 0, 0x4A, 0, 0x03, 0, 0x85, 0, 0x03, 0, 0xA9, 0, 0x03, 0, 0xC8, 0, 0x03, 0, 0xE8, 0, 0x03, 0, 0xF0, 0, 0x03, 0, 0xF5, 0, 0x03, 0, 0xFE, 0, 0x03, 0, 0xFF,
++
++       //
++       1, 0xD2, 0, 0x00, 0, 0x00, 0, 0x00, 0, 0x10, 0, 0x00, 0, 0x46, 0, 0x00, 0, 0x5F, 0, 0x00, 0, 0x7B, 0, 0x00, 0, 0xA5, 0, 0x00, 0, 0xC8, 0, 0x00, 0, 0xFF, 0, 0x01, \
++                0, 0x29, 0, 0x01, 0, 0x6E, 0, 0x01, 0, 0xA7, 0, 0x01, 0, 0xFA, 0, 0x02, 0, 0x3D, 0, 0x02, 0, 0x3F, 0, 0x02, 0, 0x7D, 0, 0x02, 0, 0xCA, 0, 0x03, 0, 0x00, \
++                0, 0x03, 0, 0x4A, 0, 0x03, 0, 0x85, 0, 0x03, 0, 0xA9, 0, 0x03, 0, 0xC8, 0, 0x03, 0, 0xE8, 0, 0x03, 0, 0xF0, 0, 0x03, 0, 0xF5, 0, 0x03, 0, 0xFE, 0, 0x03, 0, 0xFF,
++
++       //
++       1, 0xD3, 0, 0x00, 0, 0x00, 0, 0x00, 0, 0x10, 0, 0x00, 0, 0x46, 0, 0x00, 0, 0x5F, 0, 0x00, 0, 0x7B, 0, 0x00, 0, 0xA5, 0, 0x00, 0, 0xC8, 0, 0x00, 0, 0xFF, 0, 0x01, \
++                0, 0x29, 0, 0x01, 0, 0x6E, 0, 0x01, 0, 0xA7, 0, 0x01, 0, 0xFa, 0, 0x02, 0, 0x3D, 0, 0x02, 0, 0x3F, 0, 0x02, 0, 0x7D, 0, 0x02, 0, 0xCA, 0, 0x03, 0, 0x00, \
++                0, 0x03, 0, 0x4A, 0, 0x03, 0, 0x85, 0, 0x03, 0, 0xA9, 0, 0x03, 0, 0xC8, 0, 0x03, 0, 0xE8, 0, 0x03, 0, 0xF0, 0, 0x03, 0, 0xF5, 0, 0x03, 0, 0xFE, 0, 0x03, 0, 0xFF,
++
++       //
++       1, 0xD4, 0, 0x00, 0, 0x00, 0, 0x00, 0, 0x10, 0, 0x00, 0, 0x46, 0, 0x00, 0, 0x5F, 0, 0x00, 0, 0x7B, 0, 0x00, 0, 0xA5, 0, 0x00, 0, 0xC8, 0, 0x00, 0, 0xFF, 0, 0x01, \
++                0, 0x29, 0, 0x01, 0, 0x6E, 0, 0x01, 0, 0xA7, 0, 0x01, 0, 0xFA, 0, 0x02, 0, 0x3D, 0, 0x02, 0, 0x3F, 0, 0x02, 0, 0x7D, 0, 0x02, 0, 0xCA, 0, 0x03, 0, 0x00, \
++                0, 0x03, 0, 0x4A, 0, 0x03, 0, 0x85, 0, 0x03, 0, 0xA9, 0, 0x03, 0, 0xC8, 0, 0x03, 0, 0xE8, 0, 0x03, 0, 0xF0, 0, 0x03, 0, 0xF5, 0, 0x03, 0, 0xFE, 0, 0x03, 0, 0xFF,
++
++       //
++       1, 0xD5, 0, 0x00, 0, 0x00, 0, 0x00, 0, 0x10, 0, 0x00, 0, 0x46, 0, 0x00, 0, 0x5F, 0, 0x00, 0, 0x7B, 0, 0x00, 0, 0xA5, 0, 0x00, 0, 0xC8, 0, 0x00, 0, 0xFF, 0, 0x01, \
++                0, 0x29, 0, 0x01, 0, 0x6E, 0, 0x01, 0, 0xA7, 0, 0x01, 0, 0xFA, 0, 0x02, 0, 0x3D, 0, 0x02, 0, 0x3F, 0, 0x02, 0, 0x7D, 0, 0x02, 0, 0xCA, 0, 0x03, 0, 0x00, \
++                0, 0x03, 0, 0x4A, 0, 0x03, 0, 0x85, 0, 0x03, 0, 0xA9, 0, 0x03, 0, 0xC8, 0, 0x03, 0, 0xE8, 0, 0x03, 0, 0xF0, 0, 0x03, 0, 0xF5, 0, 0x03, 0, 0xFE, 0, 0x03, 0, 0xFF,
++
++       //
++       1, 0xD6, 0, 0x00, 0, 0x00, 0, 0x00, 0, 0x10, 0, 0x00, 0, 0x46, 0, 0x00, 0, 0x5F, 0, 0x00, 0, 0x7B, 0, 0x00, 0, 0xA5, 0, 0x00, 0, 0xC8, 0, 0x00, 0, 0xFF, 0, 0x01, \
++                0, 0x29, 0, 0x01, 0, 0x6E, 0, 0x01, 0, 0xA7, 0, 0x01, 0, 0xFA, 0, 0x02, 0, 0x3D, 0, 0x02, 0, 0x3F, 0, 0x02, 0, 0x7D, 0, 0x02, 0, 0xCA, 0, 0x03, 0, 0x00, \
++                0, 0x03, 0, 0x4A, 0, 0x03, 0, 0x85, 0, 0x03, 0, 0xA9, 0, 0x03, 0, 0xC8, 0, 0x03, 0, 0xE8, 0, 0x03, 0, 0xF0, 0, 0x03, 0, 0xF5, 0, 0x03, 0, 0xFE, 0, 0x03, 0, 0xFF,
++
++       // Interface Pixel Format
++       1, 0x3A, 0, 0x77,
++
++       // RGB Interface Signals Control
++       1, 0xB0, 0, 0x0B, 0, 0x08, 0, 0x10, 0, 0x1E, 0, 0x1E,
++
++       // Sleep Out & Booster on
++       1, 0x11,
++
++       // Long delay
++       3, 0x00,
++
++       // Display on
++       1, 0x29,
++};
++
++#else // #if LIFT_APP_THOR_NXT_GENERATION==3
++
 +const unsigned char at91_spi1_bootpic_init[] =
 +{
 +    1,ILI9341_SWRESET,  /* Software reset */
@@ -116,6 +275,8 @@
 +
 +    //1,ILI9341_RDDST,    4,0x05,
 +};
++
++#endif // #else #if LIFT_APP_THOR_NXT_GENERATION==3
 +
 +/* Boot picture */
 +
@@ -3720,6 +3881,8 @@
 +
 +void thor_lcd_hw_init(void)
 +{
++   at91_set_pio_output(AT91_PIO_PORTE, 12, 0); /* PE12_BK_LIGHT */
++
 +	at91_pio3_set_a_periph(AT91_PIO_PORTA, 24, 0);	/* LCDPWM */
 +	at91_pio3_set_a_periph(AT91_PIO_PORTA, 25, 0);	/* LCDDISP */
 +	at91_pio3_set_a_periph(AT91_PIO_PORTA, 26, 0);	/* LCDVSYNC */
@@ -3756,6 +3919,8 @@
 +	at91_periph_clk_enable(ATMEL_ID_LCDC);
 +}
 +
++#if LIFT_APP_THOR_NXT_GENERATION<3
++
 +vidinfo_t panel_info = {
 +	.vl_col = 800,
 +	.vl_row = 480,
@@ -3773,6 +3938,27 @@
 +	.mmio = ATMEL_BASE_LCDC,
 +};
 +
++#else // #if LIFT_APP_THOR_NXT_GENERATION<3
++
++vidinfo_t panel_info = {
++	.vl_col = 480,
++	.vl_row = 960,
++	.vl_clk = 33333333,
++	.vl_bpix = LCD_BPP,
++	/*.vl_bpox = LCD_OUTPUT_BPP,*/
++	.vl_tft = 1,
++	.vl_hsync_len = 10,
++	.vl_left_margin = 30,
++	.vl_right_margin = 30,
++	.vl_sync = LCDC_LCDCFG5_HSPOL | LCDC_LCDCFG5_VSPOL,
++	.vl_vsync_len = 8,
++	.vl_upper_margin = 8,
++	.vl_lower_margin = 16,
++	.mmio = ATMEL_BASE_LCDC,
++};
++
++#endif // #else #if LIFT_APP_THOR_NXT_GENERATION<3
++
 +void lcd_enable(void)
 +{
 +}
@@ -3787,10 +3973,9 @@
 +
 +void lcd_show_board_info(void)
 +{
-+    int wd, hg, fd, md;
++    int wd, hg, md;
 +    const unsigned short *pw;
 +    unsigned short *dw;
-+    unsigned short cw;
 +
 +    printf("\nTrigger splash image on HCLCD.\n");
 +
@@ -3800,9 +3985,14 @@
 +
 +    if (dw)
 +    {
-+        const int lcwd = 800;
-+        const int lchg = 480;
++        const int lcwd = panel_info.vl_col;
++        const int lchg = panel_info.vl_row;
++
++#if LIFT_APP_THOR_NXT_GENERATION<3
++
++        unsigned short cw;
 +        const int mirr = 1;
++        int fd;
 +
 +        fd = 240;
 +
@@ -3839,7 +4029,7 @@
 +                    else *dw++ = cl;
 +                }
 +
-+		dw += md;
++                dw += md;
 +            }
 +
 +            /* Sync frame buffer with LCD. */
@@ -3855,6 +4045,38 @@
 +            fd -= 16;
 +        }
 +        while(fd >= 0);
++
++#else // #if LIFT_APP_THOR_NXT_GENERATION<3
++
++        wd = (int) at91_spi_boot_picture_info.width + 1;
++        hg = (int) at91_spi_boot_picture_info.height;
++        pw = (const unsigned short*) at91_spi_boot_picture_info.pixel_data;
++        dw = (((unsigned short*) lcd_base) + (((lchg - hg) >> 1) * lcwd) + ((lcwd - wd) >> 1));
++        md = lcwd - wd;
++
++        while(hg--)
++        {
++           int n = wd;
++
++            while(n--)
++            {
++                *dw++ = *pw++;
++            }
++
++            dw += md;
++        }
++
++        /* Sync frame buffer with LCD. */
++
++        lcd_sync();
++
++        /* Turn background light on. */
++            
++        at91_set_pio_output(AT91_PIO_PORTE, 12, 1); /* PE12_BK_LIGHT */
++        mdelay(750);
++        at91_set_pio_output(AT91_PIO_PORTE, 12, 0); /* PE12_BK_LIGHT */
++
++#endif // #else#if LIFT_APP_THOR_NXT_GENERATION<3
 +    }
 +}
 +
@@ -3874,7 +4096,7 @@
 +
 +void at91_spi1_hw_bootpic(void)
 +{
-+    int i, n, k, val;
++    int i, k;
 +    int len, sze;
 +    const unsigned char* pb;
 +    unsigned char* ps;
@@ -3991,12 +4213,14 @@
 +                
 +                mdelay(10);
 +
-+                /* Next command please... */
++                /* Next command. */
 +
 +                pb += 2;
 +            }
 +
 +            mdelay(50);
++
++#if LIFT_APP_THOR_NXT_GENERATION<3
 +
 +            /* Clear screen. */
 +
@@ -4004,6 +4228,7 @@
 +            int hg = ILI9341_TFTHEIGHT;
 +            int xp = 0;
 +            int yp = 0;
++            int val, n;
 +
 +            /* Init transfer (column, row). */
 +
@@ -4180,6 +4405,13 @@
 +                /* Sleep for next frame. */
 +                //mdelay(10);
 +            }
++
++#else
++            /* Turn background light off. */
++            
++            at91_set_pio_output(AT91_PIO_PORTE, 12, 0); /* PE12_BK_LIGHT */
++
++#endif // #if LIFT_APP_THOR_NXT_GENERATION<3
 +
 +            /* Release the SPI. */
 +            
