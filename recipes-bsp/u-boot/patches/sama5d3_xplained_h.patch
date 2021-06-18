@@ -17,7 +17,7 @@
 +  #define CONFIG_CONSOLE_SCROLL_LINES 5
 +#endif
 +
-+#define LIFT_APP_THOR_NXT_GENERATION  2  // Define that the Bootloader is made for the NX-T3 generation boards.
++#define LIFT_APP_THOR_NXT_GENERATION  2  // Define that the Bootloader is made for the NX-T3 (3) or NX-T2 (2) generation boards.
 +
  /*
   * This needs to be defined for the OHCI code to work but it is defined as
