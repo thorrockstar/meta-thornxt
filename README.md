@@ -13,7 +13,7 @@ https://www.linux4sam.org
 
 Supported SoCs / MACHINE names
 ==============================
-- SAMA5D3 product family / sama5d3-xplained (THOR-NXT-2)
+- SAMA5D3 based THOR-NX-T2/3 lift controller boards
 
 
 Sources
@@ -117,25 +117,25 @@ This should be done by the 'defconfig' but double check before building because 
 
 Typical bitbake output
 ======================
-Build Configuration:
-BB_VERSION           = "1.46.0"
-BUILD_SYS            = "x86_64-linux"
-NATIVELSBSTRING      = "universal"
-TARGET_SYS           = "arm-poky-linux-gnueabi"
-MACHINE              = "sama5d3-xplained"
-DISTRO               = "poky-atmel"
-DISTRO_VERSION       = "3.1.11"
-TUNE_FEATURES        = "arm vfp cortexa5 thumb callconvention-hard"
-TARGET_FPU           = "hard"
-meta                 
-meta-poky            
-meta-yocto-bsp       = "dunfell:0810ac6b926cd901f0619e95f367efc79d4c3159"
-meta-atmel           = "dunfell:c9498d19ed964ed4ad2ba9a23c0ab7b7dd56f4c1"
-meta-thornxt         = "dunfell:6546dc566ab89650ac6909283d76fad2349210a0"
-meta-oe              
-meta-networking      
-meta-python          = "dunfell:814eec96c2a29172da57a425a3609f8b6fcc6afe"
-workspace            = "dunfell:0810ac6b926cd901f0619e95f367efc79d4c3159"
+    Build Configuration:
+    BB_VERSION           = "1.46.0"
+    BUILD_SYS            = "x86_64-linux"
+    NATIVELSBSTRING      = "universal"
+    TARGET_SYS           = "arm-poky-linux-gnueabi"
+    MACHINE              = "sama5d3-xplained"
+    DISTRO               = "poky-atmel"
+    DISTRO_VERSION       = "3.1.11"
+    TUNE_FEATURES        = "arm vfp cortexa5 thumb callconvention-hard"
+    TARGET_FPU           = "hard"
+    meta                 
+    meta-poky            
+    meta-yocto-bsp       = "dunfell:0810ac6b926cd901f0619e95f367efc79d4c3159"
+    meta-atmel           = "dunfell:c9498d19ed964ed4ad2ba9a23c0ab7b7dd56f4c1"
+    meta-thornxt         = "dunfell:6546dc566ab89650ac6909283d76fad2349210a0"
+    meta-oe              
+    meta-networking      
+    meta-python          = "dunfell:814eec96c2a29172da57a425a3609f8b6fcc6afe"
+    workspace            = "dunfell:0810ac6b926cd901f0619e95f367efc79d4c3159"
 
 Contributing
 ============
