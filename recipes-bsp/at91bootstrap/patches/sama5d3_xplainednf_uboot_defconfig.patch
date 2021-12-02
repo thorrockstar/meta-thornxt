@@ -1,7 +1,7 @@
---- a/board/sama5d3_xplained/sama5d3_xplainednf_uboot_defconfig	2016-02-29 11:07:05.000000000 +0100
-+++ b/board/sama5d3_xplained/sama5d3_xplainednf_uboot_defconfig	2017-01-04 16:14:07.600803641 +0100
-@@ -3,5 +3,13 @@
- CONFIG_RAM_256MB=y
+--- a/configs/sama5d3_xplainednf_uboot_defconfig	2021-11-22 10:14:31.304880117 +0100
++++ b/configs/sama5d3_xplainednf_uboot_defconfig	2021-11-22 10:28:02.688922419 +0100
+@@ -11,8 +11,15 @@
+ CONFIG_NANDFLASH=y
  # CONFIG_PMECC_AUTO_DETECT is not set
  CONFIG_PMECC_CORRECT_BITS_4=y
 -CONFIG_IMG_SIZE="0x000c0000"
@@ -13,5 +13,7 @@
 +CONFIG_MAC0_PHY=n
 +CONFIG_MAC1_PHY=y
 +CONFIG_PM_EXTERNAL_DEVICES=y
-+CONFIG_ACT8865=y
 +CONFIG_PMIC_ON_TWI1=y
+ CONFIG_TWI1=y
+ CONFIG_ACT8865=y
+ CONFIG_ACT8865_SET_VOLTAGE=y

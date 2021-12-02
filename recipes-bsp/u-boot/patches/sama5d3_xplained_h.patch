@@ -1,33 +1,24 @@
 --- a/include/configs/sama5d3_xplained.h
 +++ b/include/configs/sama5d3_xplained.h
-@@ -2,6 +2,8 @@
- /*
-  * Configuration settings for the SAMA5D3 Xplained board.
-  *
-+ * Modified for the THOR NX-T2/3 board 2021-03-31 by Roy Schneider.
-+ *
-  * Copyright (C) 2014 Atmel Corporation
-  *		      Bo Shen <voice.shen@atmel.com>
-  */
-@@ -11,6 +13,12 @@
- 
+@@ -12,6 +12,12 @@
+ #include <linux/sizes.h>
  #include "at91-sama5_common.h"
  
 +#ifndef CONFIG_CONSOLE_SCROLL_LINES
 +  #define CONFIG_CONSOLE_SCROLL_LINES 5
 +#endif
 +
-+#define LIFT_APP_THOR_NXT_GENERATION  2  // Define that the Bootloader is made for the NX-T3 generation boards.
++#define LIFT_APP_THOR_NXT_GENERATION  2  // Define wheter the Bootloader is made for the NX-T3 (3) or NX-T2 (2) generation boards.
 +
  /*
   * This needs to be defined for the OHCI code to work but it is defined as
   * ATMEL_ID_UHPHS in the CPU specific header files.
-@@ -33,6 +39,15 @@
+@@ -34,6 +40,15 @@
  	(CONFIG_SYS_SDRAM_BASE + 16 * 1024 - GENERATED_GBL_DATA_SIZE)
  #endif
  
 +/* SPI/LCD for boot picture */
-+#define CONFIG_ATMEL_SPI
++//#define CONFIG_ATMEL_SPI
 +#define CONFIG_ATMEL_HLCD
 +#define CONFIG_LCD
 +#define CONFIG_LCD_INFO
@@ -38,9 +29,9 @@
  /* NAND flash */
  #ifdef CONFIG_CMD_NAND
  #define CONFIG_SYS_MAX_NAND_DEVICE	1
-@@ -75,7 +90,8 @@
- #define CONFIG_SPL_NAND_DRIVERS
- #define CONFIG_SPL_NAND_BASE
+@@ -71,7 +86,8 @@
+ #ifdef CONFIG_SD_BOOT
+ #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME	"u-boot.img"
  #endif
 -#define CONFIG_SYS_NAND_U_BOOT_OFFS	0x40000
 +#define CONFIG_SYS_NAND_U_BOOT_OFFS	0x10000

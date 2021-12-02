@@ -1,19 +1,19 @@
 ---  a/net/eth-uclass.c	
 +++  b/net/eth-uclass.c
-@@ -517,8 +517,8 @@ static int eth_post_probe(struct udevice *dev)
+@@ -575,8 +575,8 @@ static int eth_post_probe(struct udevice *dev)
  		printf("\nWarning: %s (eth%d) using random MAC address - %pM\n",
- 		       dev->name, dev->seq, pdata->enetaddr);
+		       dev->name, dev_seq(dev), pdata->enetaddr);
  #else
 -		printf("\nError: %s address not set.\n",
 -		       dev->name);
 +		//printf("\nError: %s address not set.\n",
 +		//       dev->name);
- 		return -EINVAL;
+		return -EINVAL;
  #endif
- 	}
+	}
 ---  a/net/eth_legacy.c	
 +++  b/net/eth_legacy.c
-@@ -159,8 +159,8 @@ int eth_write_hwaddr(struct eth_device *dev, const char *base_name,
+@@ -165,8 +165,8 @@ int eth_write_hwaddr(struct eth_device *dev, const char *base_name,
  		printf("\nWarning: %s (eth%d) using random MAC address - %pM\n",
  		       dev->name, eth_number, dev->enetaddr);
  #else
@@ -24,3 +24,16 @@
  		return -EINVAL;
  #endif
  	}
+--- a/net/eth_legacy.c
++++ b/net/eth_legacy.c
+@@ -262,8 +262,8 @@
+ 	}
+ 
+ 	if (!eth_devices) {
+-		log_err("No ethernet found.\n");
+-		bootstage_error(BOOTSTAGE_ID_NET_ETH_START);
++		//log_err("No ethernet found.\n");
++		//bootstage_error(BOOTSTAGE_ID_NET_ETH_START);
+ 	} else {
+ 		struct eth_device *dev = eth_devices;
+ 		char *ethprime = env_get("ethprime");
