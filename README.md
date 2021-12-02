@@ -2,13 +2,13 @@ This layer provides support for the Thor-NXT platform reference boards
 ======================================================================
 
 For more information about the Thor-NXT product line see:
-http://www.thor.engineering
+https://www.thor.engineering
 
 NeXt-Group - Open projects for lifts
-http://www.next-group.org
+https://www.next-group.org
 
 Generic Linux & Open Source on Atmel micro controllers:
-http://www.linux4sam.org
+https://www.linux4sam.org
 
 
 Supported SoCs / MACHINE names
@@ -51,28 +51,24 @@ Build procedure
     cd poky
 
 1/ Clone yocto/poky git repository with the proper branch ready.  
-    git clone git://git.yoctoproject.org/poky
+    git clone git://git.yoctoproject.org/poky -b dunfell
 
 2/ Clone meta-openembedded git repository with the proper branch ready.  
-    git clone git://git.openembedded.org/meta-openembedded
+    git clone git://git.openembedded.org/meta-openembedded -b dunfell
 
-3/ Clone meta-qt5 git repository with the proper branch ready.  
-    git clone git://github.com/meta-qt5/meta-qt5.git
+3/ Clone meta-atmel layer with the proper branch ready.  
+    git clone git://github.com/linux4sam/meta-atmel.git -b dunfell
 
-4/ Clone meta-atmel layer with the proper branch ready.  
-    git clone git://github.com/linux4sam/meta-atmel.git
+4/ Clone meta-thornxt layer with the proper branch ready.  
+    git clone git://github.com/thorrockstar/meta-thornxt.git -b dunfell
 
-5/ Clone meta-thornxt layer with the proper branch ready.  
-    git clone git://github.com/thorrockstar/meta-thornxt.git
-
-6/ Enter the poky directory to configure the build system and start the build process.  
+5/ Enter the poky directory to configure the build system and start the build process.  
    cd poky
 
-7/ Initialize build directory and set compiler.  
-    export CROSS_COMPILE=arm-linux-gnueabi-  
+6/ Initialize build directory and set compiler.  
     source oe-init-build-env build-atmel
 
-8/ Add meta-thornxt layer to bblayer configuration file.  
+7/ Add meta-thornxt layer to bblayer configuration file.  
     vi conf/bblayers.conf
 
     BBPATH = "${TOPDIR}"
@@ -89,7 +85,6 @@ Build procedure
       ${BSPDIR}/meta-openembedded/meta-oe \
       ${BSPDIR}/meta-openembedded/meta-networking \
       ${BSPDIR}/meta-openembedded/meta-python \
-      ${BSPDIR}/meta-qt5 \
       "
 
     BLAYERS_NON_REMOVABLE ?= " \
@@ -118,29 +113,29 @@ has been turned **off** as well as **'General Setup->Timers subsystem->Timer tic
 This should be done by the 'defconfig' but double check before building because it is cruicial.
 
 10/ Build Thor demo images  
-    bitbake thor-nxt-image
+    bitbake atmel-xplained-demo-image
 
 Typical bitbake output
 ======================
-    Build Configuration:
-    BB_VERSION        = "1.32.0"
-    BUILD_SYS         = "i686-linux"
-    NATIVELSBSTRING   = "Ubuntu-16.04"
-    TARGET_SYS        = "arm-poky-linux-gnueabi"
-    MACHINE           = "sama5d3-xplained"
-    DISTRO            = "poky-atmel"
-    DISTRO_VERSION    = "2.2.2"
-    TUNE_FEATURES     = "arm armv7a vfp thumb            callconvention-hard            cortexa5"
-    TARGET_FPU        = "hard"
-    meta              
-    meta-poky         
-    meta-yocto-bsp    = "master:d05941ae4567def4a288894717e5f550da246107"
-    meta-atmel        = "master:8c79606d3e73179506a6bbc40406f2c3aa9bf40e"
-    meta-thornxt      = "master:824b7b7d95d1837806d9c9c454ae02ba6550968b"
-    meta-oe           
-    meta-networking   
-    meta-python       = "master:fe5c83312de11e80b85680ef237f8acb04b4b26e"
-    meta-qt5          = "master:3601fd2c5306ac6d5d0d536e0be8cbb90da9b4c1"
+Build Configuration:
+BB_VERSION           = "1.46.0"
+BUILD_SYS            = "x86_64-linux"
+NATIVELSBSTRING      = "universal"
+TARGET_SYS           = "arm-poky-linux-gnueabi"
+MACHINE              = "sama5d3-xplained"
+DISTRO               = "poky-atmel"
+DISTRO_VERSION       = "3.1.11"
+TUNE_FEATURES        = "arm vfp cortexa5 thumb callconvention-hard"
+TARGET_FPU           = "hard"
+meta                 
+meta-poky            
+meta-yocto-bsp       = "dunfell:0810ac6b926cd901f0619e95f367efc79d4c3159"
+meta-atmel           = "dunfell:c9498d19ed964ed4ad2ba9a23c0ab7b7dd56f4c1"
+meta-thornxt         = "dunfell:6546dc566ab89650ac6909283d76fad2349210a0"
+meta-oe              
+meta-networking      
+meta-python          = "dunfell:814eec96c2a29172da57a425a3609f8b6fcc6afe"
+workspace            = "dunfell:0810ac6b926cd901f0619e95f367efc79d4c3159"
 
 Contributing
 ============

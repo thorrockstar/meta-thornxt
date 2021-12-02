@@ -26,3 +26,4 @@ IMAGE_INSTALL = "\
     "
 
 inherit core-image
+

@@ -46,7 +46,7 @@ proc set_uboot_env {nameOfLstOfVar} {
 }
 
 ################################################################################
-#  Main script: Load the linux demo in NandFlash,
+#  Main script: Load the linux image in NandFlash,
 #               Update the environment variables
 ################################################################################
 

@@ -243,7 +243,7 @@
 				pinctrl-names = "default";
 				pinctrl-0 = <&pinctrl_pck0_as_audio_mck>;
 
-				atmel,model = "ssm2815 @ THORNXT";
+				atmel,model = "ssm2518 @ THORNXT";
 				atmel,audio-routing =
 					"Speaker Out", "OUTL",
 					"Speaker Out", "OUTR";
@@ -251,7 +251,6 @@
 				atmel,ssc-controller = <&ssc1>;
 				atmel,audio-codec = <&ssm2518>;
 
-				clocks = <&pck0>;
 				clock-names = "mclk";
 
 				status = "okay";

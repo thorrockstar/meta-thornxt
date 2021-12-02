@@ -1,6 +1,6 @@
 --- a/drivers/gpu/drm/panel/panel-simple.c
 +++ b/drivers/gpu/drm/panel/panel-simple.c
-@@ -2486,6 +2486,54 @@
+@@ -709,6 +709,54 @@
  	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
  };
  
@@ -14,7 +14,7 @@
 +	.vsync_start = 480 + 13,
 +	.vsync_end = 480 + 13 + 3,
 +	.vtotal = 480 + 13 + 3 + 29,
-+	.vrefresh = 60,
++	//.vrefresh = 60,
 +	.flags = DRM_MODE_FLAG_NVSYNC | DRM_MODE_FLAG_NHSYNC,
 +};
 +
@@ -38,7 +38,7 @@
 +	.vsync_start = 960 + 16,
 +	.vsync_end = 960 + 16 + 8,
 +	.vtotal = 960 + 16 + 8 + 8,
-+	.vrefresh = 60,
++	//.vrefresh = 60,
 +	.flags = DRM_MODE_FLAG_NVSYNC | DRM_MODE_FLAG_NHSYNC,
 +};
 +
@@ -52,13 +52,13 @@
 +	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
 +};
 +
- static const struct of_device_id platform_of_match[] = {
- 	{
- 		.compatible = "ampire,am-480272h3tmqw-t01h",
-@@ -2755,6 +2779,12 @@
- 		.compatible = "winstar,wf35ltiacd",
- 		.data = &winstar_wf35ltiacd,
- 	}, {
+ static const struct drm_display_mode ampire_am800480r3tmqwa1h_mode = {
+ 	.clock = 33333,
+ 	.hdisplay = 800,
+@@ -4305,6 +4353,12 @@
+		.compatible = "panel-dpi",
+		.data = &panel_dpi,
+	}, {
 +		.compatible = "eastrising,ertft050",
 +		.data = &eastrising_ertft050,
 +	}, {

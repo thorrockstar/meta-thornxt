@@ -1,6 +1,6 @@
 --- a/board/atmel/sama5d3_xplained/sama5d3_xplained.c
 +++ b/board/atmel/sama5d3_xplained/sama5d3_xplained.c
-@@ -13,11 +13,4523 @@
+@@ -13,11 +13,4497 @@
  #include <asm/arch/clk.h>
  #include <debug_uart.h>
  #include <spl.h>
@@ -8,11 +8,213 @@
 +#include <spi.h>
 +#include <lcd.h>
 +#include <atmel_hlcdc.h>
++#include "../drivers/spi/atmel_spi.h"
++#include <linux/delay.h>
  #include <asm/arch/atmel_mpddrc.h>
  #include <asm/arch/at91_wdt.h>
  
  DECLARE_GLOBAL_DATA_PTR;
  
++struct atmel_spi_slave {
++	struct spi_slave slave;
++	void		*regs;
++	u32		mr;
++};
++
++static inline struct atmel_spi_slave *to_atmel_spi(struct spi_slave *slave)
++{
++	return container_of(slave, struct atmel_spi_slave, slave);
++}
++static int spi_has_wdrbt(struct atmel_spi_slave *slave)
++{
++	unsigned int ver;
++
++	ver = spi_readl(slave, VERSION);
++
++	return (ATMEL_SPI_VERSION_REV(ver) >= 0x210);
++}
++
++struct spi_slave *spi_setup_slave(unsigned int bus, unsigned int cs,
++			unsigned int max_hz, unsigned int mode)
++{
++	struct atmel_spi_slave	*as;
++	unsigned int		scbr;
++	u32			csrx;
++	void			*regs;
++
++	if (!spi_cs_is_valid(bus, cs))
++		return NULL;
++
++	switch (bus) {
++	case 0:
++		regs = (void *)ATMEL_BASE_SPI0;
++		break;
++#ifdef ATMEL_BASE_SPI1
++	case 1:
++		regs = (void *)ATMEL_BASE_SPI1;
++		break;
++#endif
++#ifdef ATMEL_BASE_SPI2
++	case 2:
++		regs = (void *)ATMEL_BASE_SPI2;
++		break;
++#endif
++#ifdef ATMEL_BASE_SPI3
++	case 3:
++		regs = (void *)ATMEL_BASE_SPI3;
++		break;
++#endif
++	default:
++		return NULL;
++	}
++
++
++	scbr = (get_spi_clk_rate(bus) + max_hz - 1) / max_hz;
++	if (scbr > ATMEL_SPI_CSRx_SCBR_MAX)
++		/* Too low max SCK rate */
++		return NULL;
++	if (scbr < 1)
++		scbr = 1;
++
++	csrx = ATMEL_SPI_CSRx_SCBR(scbr);
++	csrx |= ATMEL_SPI_CSRx_BITS(ATMEL_SPI_BITS_8);
++	if (!(mode & SPI_CPHA))
++		csrx |= ATMEL_SPI_CSRx_NCPHA;
++	if (mode & SPI_CPOL)
++		csrx |= ATMEL_SPI_CSRx_CPOL;
++
++	as = spi_alloc_slave(struct atmel_spi_slave, bus, cs);
++	if (!as)
++		return NULL;
++
++	as->regs = regs;
++	as->mr = ATMEL_SPI_MR_MSTR | ATMEL_SPI_MR_MODFDIS
++			| ATMEL_SPI_MR_PCS(~(1 << cs) & 0xf);
++	if (spi_has_wdrbt(as))
++		as->mr |= ATMEL_SPI_MR_WDRBT;
++
++	spi_writel(as, CSR(cs), csrx);
++
++	return &as->slave;
++}
++void spi_free_slave(struct spi_slave *slave)
++{
++	struct atmel_spi_slave *as = to_atmel_spi(slave);
++
++	free(as);
++}
++
++int spi_claim_bus(struct spi_slave *slave)
++{
++	struct atmel_spi_slave *as = to_atmel_spi(slave);
++
++	/* Enable the SPI hardware */
++	spi_writel(as, CR, ATMEL_SPI_CR_SPIEN);
++
++	/*
++	 * Select the slave. This should set SCK to the correct
++	 * initial state, etc.
++	 */
++	spi_writel(as, MR, as->mr);
++
++	return 0;
++}
++
++void spi_release_bus(struct spi_slave *slave)
++{
++	struct atmel_spi_slave *as = to_atmel_spi(slave);
++
++	/* Disable the SPI hardware */
++	spi_writel(as, CR, ATMEL_SPI_CR_SPIDIS);
++}
++
++int spi_xfer(struct spi_slave *slave, unsigned int bitlen,
++		const void *dout, void *din, unsigned long flags)
++{
++	struct atmel_spi_slave *as = to_atmel_spi(slave);
++	unsigned int	len_tx;
++	unsigned int	len_rx;
++	unsigned int	len;
++	u32		status;
++	const u8	*txp = dout;
++	u8		*rxp = din;
++	u8		value;
++
++	if (bitlen == 0)
++		/* Finish any previously submitted transfers */
++		goto out;
++
++	/*
++	 * TODO: The controller can do non-multiple-of-8 bit
++	 * transfers, but this driver currently doesn't support it.
++	 *
++	 * It's also not clear how such transfers are supposed to be
++	 * represented as a stream of bytes...this is a limitation of
++	 * the current SPI interface.
++	 */
++	if (bitlen % 8) {
++		/* Errors always terminate an ongoing transfer */
++		flags |= SPI_XFER_END;
++		goto out;
++	}
++
++	len = bitlen / 8;
++
++	/*
++	 * The controller can do automatic CS control, but it is
++	 * somewhat quirky, and it doesn't really buy us much anyway
++	 * in the context of U-Boot.
++	 */
++	if (flags & SPI_XFER_BEGIN) {
++		spi_cs_activate(slave);
++		/*
++		 * sometimes the RDR is not empty when we get here,
++		 * in theory that should not happen, but it DOES happen.
++		 * Read it here to be on the safe side.
++		 * That also clears the OVRES flag. Required if the
++		 * following loop exits due to OVRES!
++		 */
++		spi_readl(as, RDR);
++	}
++
++	for (len_tx = 0, len_rx = 0; len_rx < len; ) {
++		status = spi_readl(as, SR);
++
++		if (status & ATMEL_SPI_SR_OVRES)
++			return -1;
++
++		if (len_tx < len && (status & ATMEL_SPI_SR_TDRE)) {
++			if (txp)
++				value = *txp++;
++			else
++				value = 0;
++			spi_writel(as, TDR, value);
++			len_tx++;
++		}
++		if (status & ATMEL_SPI_SR_RDRF) {
++			value = spi_readl(as, RDR);
++			if (rxp)
++				*rxp++ = value;
++			len_rx++;
++		}
++	}
++
++out:
++	if (flags & SPI_XFER_END) {
++		/*
++		 * Wait until the transfer is completely done before
++		 * we deactivate CS.
++		 */
++		do {
++			status = spi_readl(as, SR);
++		} while (!(status & ATMEL_SPI_SR_TXEMPTY));
++
++		spi_cs_deactivate(slave);
++	}
++
++	return 0;
++}
++
 +/* Macros for getting the red, green or blue value form a RGB-5:6:5 value. */
 +
 +#define APP_GET_RED_VALUE_565(x)   ((x >> 11) & 0x1F)
@@ -23,62 +225,17 @@
 +#define APP_MAKE_RGB_VALUE_565(r,g,b) ((r << 11) | (g << 5) | b)
 +#define APP_MAKE_RGB_VALUE_565_SWAP_BYTES(r,g,b) ((r << 3) | (g << 13) | (g >> 3) | (b << 8))
 +
-+#if defined(CONFIG_ATMEL_SPI)
 +
-+/* Adafruit Display 1983 definitions. */
-+
-+#define ILI9341_TFTWIDTH    320
-+#define ILI9341_TFTHEIGHT   240
-+
-+#define ILI9341_SWRESET     0x01
-+#define ILI9341_RDDID       0x04
-+#define ILI9341_RDDST       0x09
-+#define ILI9341_RDDPWR      0x0A
-+
-+#define ILI9341_SLPOUT      0x11
-+#define ILI9341_PTLON       0x12
-+#define ILI9341_NORON       0x13
-+
-+#define ILI9341_GAMMASET    0x26
-+#define ILI9341_DISPOFF     0x28
-+#define ILI9341_DISPON      0x29
-+
-+#define ILI9341_CASET       0x2A
-+#define ILI9341_PASET       0x2B
-+#define ILI9341_RAMWR       0x2C
-+#define ILI9341_RAMRD       0x2E
-+
-+#define ILI9341_MADCTL      0x36
-+#define ILI9341_PIXFMT      0x3A
-+
-+#define ILI9341_FRMCTR1     0xB1
-+#define ILI9341_DFUNCTR     0xB6
-+
-+#define ILI9341_PWCTR1      0xC0
-+#define ILI9341_PWCTR2      0xC1
-+#define ILI9341_VMCTR1      0xC5
-+#define ILI9341_VMCTR2      0xC7
-+#define ILI9341_PWRCTRA     0xCB
-+#define ILI9341_PWRCTRB     0xCF
-+
-+#define ILI9341_GMCTRP1     0xE0
-+#define ILI9341_GMCTRN1     0xE1
-+#define ILI9341_DRVTCTRA    0xE8
-+#define ILI9341_DRVTCTRB    0xEA
-+#define ILI9341_PWRSQCTR    0xED
-+
-+#define ILI9341_ENABLE3G    0xF2
-+#define ILI9341_PMRTCTRA    0xF7
 +
 +/* Structure definition for the test picture. */
 +
-+typedef struct _at91_spi_bootpic_type
++typedef struct _at91_bootpic_type
 +{
 +  unsigned int width;
 +  unsigned int height;
 +  const unsigned char *pixel_data;
 +  
-+} _at91_spi_bootpic_type;
++} _at91_bootpic_type;
 +
 +/* Vendor specific initialization command sequence for ILI9341 IC */
 +
@@ -239,48 +396,11 @@
 +       1, 0x29,
 +};
 +
-+#else // #if LIFT_APP_THOR_NXT_GENERATION==3
-+
-+const unsigned char at91_spi1_bootpic_init[] =
-+{
-+    1,ILI9341_SWRESET,  /* Software reset */
-+    3,0x00,             /* Delay long */
-+    1,ILI9341_DISPOFF,  /* Display off */
-+    
-+    1,ILI9341_PWRCTRB,  0,0x00, 0,0xC1, 0,0x30,
-+    1,ILI9341_PWRSQCTR, 0,0x64, 0,0x03, 0,0x12, 0,0x81,
-+    1,ILI9341_DRVTCTRA, 0,0x85, 0,0x00, 0,0x78,
-+    1,ILI9341_PWRCTRA,  0,0x39, 0,0x2C, 0,0x00, 0,0x34, 0,0x02,
-+    1,ILI9341_PMRTCTRA, 0,0x20,
-+    1,ILI9341_DRVTCTRB, 0,0x00, 0,0x00,
-+    1,ILI9341_PWCTR1,   0,0x23,
-+    1,ILI9341_PWCTR2,   0,0x10,
-+    1,ILI9341_VMCTR1,   0,0x3e, 0,0x28,
-+    1,ILI9341_VMCTR2,   0,0x86,
-+    1,ILI9341_MADCTL,   0,0x28,
-+    1,ILI9341_PIXFMT,   0,0x55,
-+    1,ILI9341_FRMCTR1,  0,0x00, 0,0x18,
-+    1,ILI9341_DFUNCTR,  0,0x08, 0,0x82, 0,0x27,
-+    1,ILI9341_ENABLE3G, 0,0x00,
-+    1,ILI9341_GAMMASET, 0,0x01,
-+    1,ILI9341_GMCTRP1,  0,0x0F, 0,0x31, 0,0x2B, 0,0x0C, 0,0x0E, 0,0x08, 0,0x4E, 0,0xF1, 0,0x37, 0,0x07, 0,0x10, 0,0x03, 0,0x0E, 0,0x09, 0,0x00,
-+    1,ILI9341_GMCTRN1,  0,0x00, 0,0x0E, 0,0x14, 0,0x03, 0,0x11, 0,0x07, 0,0x31, 0,0xC1, 0,0x48, 0,0x08, 0,0x0F, 0,0x0C, 0,0x31, 0,0x36, 0,0x0F,
-+    
-+    1,ILI9341_SLPOUT,   /* Sleep out / Awake */
-+    //3,0x00,             /* Delay long */
-+    1,ILI9341_DISPON,   /* Display on */
-+    //3,0x00,             /* Delay long */
-+
-+    /* Finally read out the display status. */
-+
-+    //1,ILI9341_RDDST,    4,0x05,
-+};
-+
-+#endif // #else #if LIFT_APP_THOR_NXT_GENERATION==3
++#endif // #if LIFT_APP_THOR_NXT_GENERATION==3
 +
 +/* Boot picture */
 +
-+const unsigned char at91_spi_boot_picture_data[] =
++const unsigned char at91_boot_picture_data[] =
 +{
 + 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
 + 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
@@ -3871,25 +3991,57 @@
 +
 +/* Boot picture information. */
 +
-+const _at91_spi_bootpic_type at91_spi_boot_picture_info =
++const _at91_bootpic_type at91_boot_picture_info =
 +{
-+    239, 239, at91_spi_boot_picture_data
++    239, 239, at91_boot_picture_data
 +};
 +
++void thor_gpio_init(void)
++{
++    at91_set_pio_output(AT91_PIO_PORTC, 16, 0);              /* out: shift register ext board strobe */
++    at91_set_pio_output(AT91_PIO_PORTC, 17, 0);              /* out: shift register sb board strobe */
++    at91_set_pio_output(AT91_PIO_PORTC, 18, 0);              /* out: sz board enable */
++    at91_set_pio_input(AT91_PIO_PORTC,  19, 0);              /* in: ext board present */
++    at91_set_pio_input(AT91_PIO_PORTC,  20, 0);              /* in: sz board present */
++
++    at91_set_pio_input(AT91_PIO_PORTD,   0, 0);              /* in: SZ board zone sensor */
++    at91_set_pio_input(AT91_PIO_PORTD,   1, 0);              /* in: SZ board bridged */
++    at91_set_pio_output(AT91_PIO_PORTD,  2, 0);              /* out: shift register cpu board strobe */
++    at91_set_pio_input(AT91_PIO_PORTD,   3, 0);              /* in: shift register cpu board data in */
++    at91_set_pio_output(AT91_PIO_PORTD,  4, 0);              /* out: unused */
++    at91_set_pio_output(AT91_PIO_PORTD,  6, 0);              /* out: NXT3: CTP reset / M18: shift reg.data out / NXT2: powerup */
++    at91_set_pio_input(AT91_PIO_PORTD,   7, 0);              /* in: optional eth powerup overcurrent */
++    at91_set_pio_output(AT91_PIO_PORTD,  8, 0);              /* out: unused */
++
++    at91_set_pio_output(AT91_PIO_PORTE,  2, 0);              /* out: shift register clock */
++    at91_set_pio_input(AT91_PIO_PORTE,   6, 0);              /* in: shift register sb board data in */
++    at91_set_pio_input(AT91_PIO_PORTE,   7, 0);              /* in: shift register ext board data in */
++    at91_set_pio_output(AT91_PIO_PORTE,  8, 0);              /* out: shift register load */
++    at91_set_pio_output(AT91_PIO_PORTE, 10, 0);              /* out: shift register cpu board output enable */
++    at91_set_pio_output(AT91_PIO_PORTE, 11, 0);              /* out: shift register cpu board data out */
++    at91_set_pio_output(AT91_PIO_PORTE, 13, 0);              /* out: RS485/DCP direction pin */
++    at91_set_pio_input(AT91_PIO_PORTE,  14, 0);              /* in: CTP interuppt line */
++    at91_set_pio_output(AT91_PIO_PORTE, 15, 0);              /* out: CAN2 status */
++    at91_set_pio_output(AT91_PIO_PORTE, 16, 0);              /* out: CAN2 error */
++    at91_set_pio_output(AT91_PIO_PORTE, 17, 0);              /* out: CAN1 status */
++    at91_set_pio_output(AT91_PIO_PORTE, 18, 0);              /* out: CAN1 error */
++    at91_set_pio_output(AT91_PIO_PORTE, 19, 0);              /* out: shift register sb output enable */
++    at91_set_pio_output(AT91_PIO_PORTE, 28, 0);              /* out: display SPI data/command selection */
++}
 +
 +#ifdef CONFIG_LCD
 +
 +void thor_lcd_hw_init(void)
 +{
-+   at91_set_pio_output(AT91_PIO_PORTE, 12, 0); /* PE12_BK_LIGHT */
-+
++       at91_set_pio_output(AT91_PIO_PORTE, 12, 0);           /* PE12_BK_LIGHT */
++       printf("\nInitialize HLCD interface.\n");
++       mdelay(10);
 +	at91_pio3_set_a_periph(AT91_PIO_PORTA, 24, 0);	/* LCDPWM */
 +	at91_pio3_set_a_periph(AT91_PIO_PORTA, 25, 0);	/* LCDDISP */
 +	at91_pio3_set_a_periph(AT91_PIO_PORTA, 26, 0);	/* LCDVSYNC */
 +	at91_pio3_set_a_periph(AT91_PIO_PORTA, 27, 0);	/* LCDHSYNC */
 +	at91_pio3_set_a_periph(AT91_PIO_PORTA, 28, 0);	/* LCDDOTCK */
 +	at91_pio3_set_a_periph(AT91_PIO_PORTA, 29, 0);	/* LCDDEN */
-+
 +	at91_pio3_set_a_periph(AT91_PIO_PORTA,  0, 0);	/* LCDD0 */
 +	at91_pio3_set_a_periph(AT91_PIO_PORTA,  1, 0);	/* LCDD1 */
 +	at91_pio3_set_a_periph(AT91_PIO_PORTA,  2, 0);	/* LCDD2 */
@@ -3994,15 +4146,23 @@
 +        const int mirr = 1;
 +        int fd;
 +
++        /* Sync frame buffer with LCD. */
++
++        lcd_sync();
++
++        /* Turn background light on. */
++            
++        at91_set_pio_output(AT91_PIO_PORTE, 12, 1); /* PE12_BK_LIGHT */
++
 +        fd = 240;
 +
 +        do
 +        {
 +            /* Do blit-fading. */
 +
-+            wd = (int) at91_spi_boot_picture_info.width + 1;
-+            hg = (int) at91_spi_boot_picture_info.height;
-+            pw = (const unsigned short*) at91_spi_boot_picture_info.pixel_data;
++            wd = (int) at91_boot_picture_info.width + 1;
++            hg = (int) at91_boot_picture_info.height;
++            pw = (const unsigned short*) at91_boot_picture_info.pixel_data;
 +            dw = (((unsigned short*) lcd_base) + (((lchg - hg) >> 1) * lcwd) + ((lcwd - wd) >> 1)) + (mirr ? ((hg * lcwd) + wd) : 0);
 +            md = mirr ? (-(lcwd - wd)) : (lcwd - wd);
 +
@@ -4048,9 +4208,9 @@
 +
 +#else // #if LIFT_APP_THOR_NXT_GENERATION<3
 +
-+        wd = (int) at91_spi_boot_picture_info.width + 1;
-+        hg = (int) at91_spi_boot_picture_info.height;
-+        pw = (const unsigned short*) at91_spi_boot_picture_info.pixel_data;
++        wd = (int) at91_boot_picture_info.width + 1;
++        hg = (int) at91_boot_picture_info.height;
++        pw = (const unsigned short*) at91_boot_picture_info.pixel_data;
 +        dw = (((unsigned short*) lcd_base) + (((lchg - hg) >> 1) * lcwd) + ((lcwd - wd) >> 1));
 +        md = lcwd - wd;
 +
@@ -4073,10 +4233,10 @@
 +        /* Turn background light on. */
 +            
 +        at91_set_pio_output(AT91_PIO_PORTE, 12, 1); /* PE12_BK_LIGHT */
++#endif // #else#if LIFT_APP_THOR_NXT_GENERATION<3
 +        mdelay(750);
 +        at91_set_pio_output(AT91_PIO_PORTE, 12, 0); /* PE12_BK_LIGHT */
 +
-+#endif // #else#if LIFT_APP_THOR_NXT_GENERATION<3
 +    }
 +}
 +
@@ -4094,6 +4254,8 @@
 + * Show the vendor specific boot splash picture.
 + */
 +
++#if LIFT_APP_THOR_NXT_GENERATION==3
++
 +void at91_spi1_hw_bootpic(void)
 +{
 +    int i, k;
@@ -4101,15 +4263,11 @@
 +    const unsigned char* pb;
 +    unsigned char* ps;
 +    struct spi_slave *slave;
-+    unsigned char txbuf[ILI9341_TFTWIDTH << 1];
++    unsigned char txbuf[512];
 +    unsigned char rxbuf[16];
 +    
-+    printf("\nTrigger splash image on SPI-LCD.\n");
++    printf("\nInitialize LCD-controller via SPI.\n");
 +
-+    /* Init SPI. */
-+    
-+    //spi_init();
-+    
 +    /* Setup SPI. */
 +    
 +    slave = spi_setup_slave(1 /*ATMEL_BASE_SPI1*/, 0 /*SPI1_NPCS0*/, 32000000, SPI_MODE_0);
@@ -4220,198 +4378,9 @@
 +
 +            mdelay(50);
 +
-+#if LIFT_APP_THOR_NXT_GENERATION<3
-+
-+            /* Clear screen. */
-+
-+            int wd = ILI9341_TFTWIDTH;
-+            int hg = ILI9341_TFTHEIGHT;
-+            int xp = 0;
-+            int yp = 0;
-+            int val, n;
-+
-+            /* Init transfer (column, row). */
-+
-+            // X1/X2
-+            at91_set_pio_output(AT91_PIO_PORTE, 28, 0); /* PE28_WR_DISPLAY */
-+            *txbuf = ILI9341_CASET;
-+            at91_spi1_txrx_ada(slave, txbuf, NULL, 1);
-+            ps = txbuf;
-+            *ps++ = (xp >> 8) & 0xFF;
-+            *ps++ = xp & 0xFF;
-+            xp += wd;
-+            *ps++ = (xp >> 8) & 0xFF;
-+            *ps   = xp & 0xFF;
-+            at91_set_pio_output(AT91_PIO_PORTE, 28, 1); /* PE28_WR_DISPLAY */
-+            at91_spi1_txrx_ada(slave, txbuf, NULL, 4);
-+
-+            // Y1/Y2
-+            at91_set_pio_output(AT91_PIO_PORTE, 28, 0); /* PE28_WR_DISPLAY */
-+            *txbuf = ILI9341_PASET;
-+            at91_spi1_txrx_ada(slave, txbuf, NULL, 1);
-+            ps = txbuf;
-+            *ps++ = (yp >> 8) & 0xFF;
-+            *ps++ = yp & 0xFF;
-+            yp += hg;
-+            *ps++ = (yp >> 8) & 0xFF;
-+            *ps   = yp & 0xFF;
-+            at91_set_pio_output(AT91_PIO_PORTE, 28, 1); /* PE28_WR_DISPLAY */
-+            at91_spi1_txrx_ada(slave, txbuf, NULL, 4);
-+
-+            // Define the transmission mode (Write to Video RAM).
-+            at91_set_pio_output(AT91_PIO_PORTE, 28, 0); /* PE28_WR_DISPLAY */
-+            *txbuf = ILI9341_RAMWR;
-+            at91_spi1_txrx_ada(slave, txbuf, NULL, 1);
-+
-+            // Send pixel data.
-+            at91_set_pio_output(AT91_PIO_PORTE, 28, 1); /* PE28_WR_DISPLAY */
-+
-+            sze = sizeof(txbuf) >> 1;
-+            len = wd * hg;
-+            n   = len / sze;
-+            val = sze << 1;
-+            ps  = txbuf;
-+
-+            memset(txbuf, 0, sizeof(txbuf));
-+
-+            while (n--)
-+            {
-+                at91_spi1_txrx_ada(slave, ps, NULL, val);
-+            }
-+
-+            n = len % sze;
-+
-+            if (n)
-+            {
-+                at91_spi1_txrx_ada(slave, ps, NULL, n << 1);
-+            }
-+
-+            /* Turn background light on. */
-+            
-+            at91_set_pio_output(AT91_PIO_PORTE, 12, 1); /* PE12_BK_LIGHT */
-+            
-+            /* Fade the test picture. */
-+
-+            for (i = 30; i >= 0; i -= 3)
-+            {
-+                const _at91_spi_bootpic_type *pd = &at91_spi_boot_picture_info;
-+
-+                int wd = pd->width;
-+                int hg = pd->height;
-+                int xp = (ILI9341_TFTWIDTH  - wd) >> 1;
-+                int yp = (ILI9341_TFTHEIGHT - hg) >> 1;
-+
-+                /* Init transfer (column, row). */
-+
-+                // X1/X2
-+                at91_set_pio_output(AT91_PIO_PORTE, 28, 0); /* PE28_WR_DISPLAY */
-+                *txbuf = ILI9341_CASET;
-+                at91_spi1_txrx_ada(slave, txbuf, NULL, 1);
-+                ps = txbuf;
-+                *ps++ = (xp >> 8) & 0xFF;
-+                *ps++ = xp & 0xFF;
-+                xp += wd;
-+                *ps++ = (xp >> 8) & 0xFF;
-+                *ps   = xp & 0xFF;
-+                at91_set_pio_output(AT91_PIO_PORTE, 28, 1); /* PE28_WR_DISPLAY */
-+                at91_spi1_txrx_ada(slave, txbuf, NULL, 4);
-+
-+                // Y1/Y2
-+                at91_set_pio_output(AT91_PIO_PORTE, 28, 0); /* PE28_WR_DISPLAY */
-+                *txbuf = ILI9341_PASET;
-+                at91_spi1_txrx_ada(slave, txbuf, NULL, 1);
-+                ps = txbuf;
-+                *ps++ = (yp >> 8) & 0xFF;
-+                *ps++ = yp & 0xFF;
-+                yp += hg;
-+                *ps++ = (yp >> 8) & 0xFF;
-+                *ps   = yp & 0xFF;
-+                at91_set_pio_output(AT91_PIO_PORTE, 28, 1); /* PE28_WR_DISPLAY */
-+                at91_spi1_txrx_ada(slave, txbuf, NULL, 4);
-+
-+                // Define the transmission mode (Write to Video RAM).
-+                at91_set_pio_output(AT91_PIO_PORTE, 28, 0); /* PE28_WR_DISPLAY */
-+                *txbuf = ILI9341_RAMWR;
-+                at91_spi1_txrx_ada(slave, txbuf, NULL, 1);
-+
-+                // Send pixel data.
-+                at91_set_pio_output(AT91_PIO_PORTE, 28, 1); /* PE28_WR_DISPLAY */
-+
-+                sze = sizeof(txbuf) >> 1;
-+                len = wd * hg;
-+                n   = len / sze;
-+                val = sze << 1;
-+                pb  = pd->pixel_data;
-+                ps  = txbuf;
-+
-+                while (n--)
-+                {
-+                    register const unsigned short *pw1 = (const unsigned short*) pb;
-+                    register unsigned short *pw2 = (unsigned short*) ps;
-+                    register int cw;
-+
-+                    k = sze;
-+
-+                    while (k--)
-+                    {
-+                        cw = *pw1++;
-+
-+                        int rd = APP_GET_RED_VALUE_565(cw) - i;
-+                        if (rd < 0) rd = 0;
-+
-+                        int gr = APP_GET_GREEN_VALUE_565(cw) - (i << 1);
-+                        if (gr < 0) gr = 0;
-+
-+                        int bl = APP_GET_BLUE_VALUE_565(cw) - i;
-+                        if (bl < 0) bl = 0;
-+
-+                        *pw2++ = APP_MAKE_RGB_VALUE_565_SWAP_BYTES(rd, gr, bl);
-+                    }
-+
-+                    pb = (const unsigned char*) pw1;
-+
-+                    at91_spi1_txrx_ada(slave, ps, NULL, val);
-+                }
-+
-+                n = len % sze;
-+
-+                if (n)
-+                {
-+                    register const unsigned short *pw1 = (const unsigned short*) pb;
-+                    register unsigned short *pw2 = (unsigned short*) ps;
-+                    register int cw;
-+
-+                    k = n;
-+
-+                    while (k--)
-+                    {
-+                        cw = *pw1++;
-+
-+                        int rd = APP_GET_RED_VALUE_565(cw) - i;
-+                        if (rd < 0) rd = 0;
-+
-+                        int gr = APP_GET_GREEN_VALUE_565(cw) - (i << 1);
-+                        if (gr < 0) gr = 0;
-+
-+                        int bl = APP_GET_BLUE_VALUE_565(cw) - i;
-+                        if (bl < 0) bl = 0;
-+
-+                        *pw2++ = APP_MAKE_RGB_VALUE_565_SWAP_BYTES(rd, gr, bl);
-+                    }
-+
-+                    at91_spi1_txrx_ada(slave, ps, NULL, n << 1);
-+                }
-+
-+                /* Sleep for next frame. */
-+                //mdelay(10);
-+            }
-+
-+#else
 +            /* Turn background light off. */
 +            
 +            at91_set_pio_output(AT91_PIO_PORTE, 12, 0); /* PE12_BK_LIGHT */
-+
-+#endif // #if LIFT_APP_THOR_NXT_GENERATION<3
 +
 +            /* Release the SPI. */
 +            
@@ -4422,7 +4391,8 @@
 +    }
 +}
 +
-+#endif
++#endif // #if LIFT_APP_THOR_NXT_GENERATION==3
++
 +
 +#if defined(CONFIG_AT24MAC)
 +void at91_sync_env_enetaddr(uint8_t *ethaddr, uint8_t adapter)
@@ -4468,7 +4438,7 @@
 +	return 1;
 +}
 +
-+#endif
++#endif // #if defined(CONFIG_AT24MAC)
 +
 +int misc_init_r(void)
 +{
@@ -4521,6 +4491,10 @@
 +	return 0;
 +}
 +
++void board_cleanup_before_linux(void)
++{
++    at91_set_pio_output(AT91_PIO_PORTE, 12, 0); /* Turn PE12_BK_LIGHT off */
++}
  extern void at91_pda_detect(void);
  
  #ifdef CONFIG_NAND_ATMEL
@@ -4538,17 +4512,20 @@
  #ifdef CONFIG_DEBUG_UART_BOARD_INIT
  void board_debug_uart_init(void)
  {
-@@ -100,12 +4373,19 @@
+@@ -100,12 +4373,22 @@
  #ifdef CONFIG_NAND_ATMEL
  	sama5d3_xplained_nand_hw_init();
  #endif
 +
++    thor_gpio_init();
++
 +#ifdef CONFIG_LCD
 +    thor_lcd_hw_init();
++    drv_lcd_init(); // Should be called by stdio.c but is not in this version!
 +#endif /* ifdef CONFIG_LCD */
 +
-+#ifdef CONFIG_ATMEL_SPI
-+    at91_spi1_hw_init(1 << 0 /*CS*/);
++#if LIFT_APP_THOR_NXT_GENERATION==3
++    //at91_spi1_hw_init(1 << 0 /*CS*/);
 +    at91_spi1_hw_bootpic();
 +#endif
 +

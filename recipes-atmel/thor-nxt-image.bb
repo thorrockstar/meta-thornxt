@@ -59,8 +59,8 @@ IMAGE_INSTALL_remove = "\
 
 # add important components to image
 IMAGE_INSTALL_append = "\
-	glibc \
-	glib-2.0 \
+    glibc \
+    glib-2.0 \
     gnutls \
     zeromq \
     dbus \
@@ -71,7 +71,11 @@ IMAGE_INSTALL_append = "\
 
 CUSTOMFILESPATH_EXTRA := "${THISDIR}/images/files"
 
-ROOTFS_POSTPROCESS_COMMAND += " fix_udev_files ; fix_usr_files ; fix_firmware_files ; fix_interfaces_files ; "
+ROOTFS_POSTPROCESS_COMMAND += " fix_udev_files ; fix_usr_files ; fix_firmware_files ; fix_interfaces_files ; cleanup_boot_overlay_files ; "
+
+cleanup_boot_overlay_files () {
+    rm -f $D/boot/*
+}
 
 fix_udev_files () {
     rm -f $D${sysconfdir}/udev/hwdb.bin
@@ -84,8 +88,8 @@ fix_udev_files () {
 
 fix_usr_files () {
     rm -fr $D/usr/games
-    rm -fr $D/usr/lib/python2.7
-    rm -fr $D/usr/include/python2.7
+    rm -fr $D/usr/lib/python3.8
+    rm -fr $D/usr/include/python3.8
     rm -f $D/usr/lib/libpython*.so.*
 }
 
