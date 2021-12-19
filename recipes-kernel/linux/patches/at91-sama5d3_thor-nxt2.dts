@@ -1,8 +1,8 @@
 /*
- * at91-sama5d3_thor-nxt2.dts - Device Tree file for the THOR-NXT reference board.
+ * at91-sama5d3_thor-nxt2.dts - Device Tree file for the THOR-NX-T2 reference board.
  *
  *  Copyright (C) 2019 Thor Engineering GmbH,
- *		  2019 Roy Schneider <roy@thor.engineering>
+ *  2019 Roy Schneider <roy@thor.engineering>
  *
  * Licensed under GPLv2 or later.
  *
