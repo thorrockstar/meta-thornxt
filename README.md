@@ -124,14 +124,14 @@ Typical bitbake output
     TARGET_SYS           = "arm-poky-linux-gnueabi"
     MACHINE              = "sama5d3-xplained"
     DISTRO               = "poky-atmel"
-    DISTRO_VERSION       = "3.1.12"
+    DISTRO_VERSION       = "3.1.13"
     TUNE_FEATURES        = "arm vfp cortexa5 thumb callconvention-hard"
     TARGET_FPU           = "hard"
     meta                 
     meta-poky            
-    meta-yocto-bsp       = "dunfell:cf5a00721f721d5077c73d1f4e812e5c79833fba"
+    meta-yocto-bsp       = "dunfell:795339092f87672e4f68e4d3bc4cfd0e252d1831"
     meta-atmel           = "dunfell:20eeec4910f1214b9099f5276a944e5d281b70ee"
-    meta-thornxt         = "dunfell:98675d04633a2710a9f705e2d059d3dc9c70676c"
+    meta-thornxt         = "dunfell:96c8dcd70f12b45a8b8f6071b440e09d65fd8c06"
     meta-oe              
     meta-networking      
     meta-python          = "dunfell:69f94af4d91215e7d4e225bab54bf3bcfee42f1c"
