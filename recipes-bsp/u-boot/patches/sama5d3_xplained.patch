@@ -4623,14 +4623,14 @@
 +    thor_gpio_init();
 +
 +#ifdef CONFIG_LCD
-+    thor_lcd_hw_init();
++    thor_lcd_hw_init();mdelay(100);
 +
 +#if LIFT_APP_THOR_NXT_GENERATION==3
 +    at91_spi1_hw_init(1 << 0 /*CS*/);
 +    at91_spi1_hw_bootpic();
 +#endif
 +
-+    drv_lcd_init(); // Should be called by stdio.c but is not in this version!
++    drv_lcd_init();mdelay(100); // Should be called by stdio.c but is not in this version!
 +#endif /* ifdef CONFIG_LCD */
 +
  #ifdef CONFIG_CMD_USB
