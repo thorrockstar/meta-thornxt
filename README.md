@@ -53,16 +53,16 @@ Build procedure
 1/ Clone yocto/poky git repository with the proper branch ready.  
     git clone git://git.yoctoproject.org/poky -b rocko
 
-2/ Clone meta-openembedded git repository with the proper branch ready.  
+2/ Clone meta-openembedded git repository with the proper branch ready.   
     git clone git://git.openembedded.org/meta-openembedded -b rocko
 
-3/ Clone meta-qt5 git repository with the proper branch ready.
+3/ Clone meta-qt5 git repository with the proper branch ready.   
     git clone https://github.com/meta-qt5/meta-qt5.git -b rocko
 
-4/ Clone meta-atmel layer with the proper branch ready.  
+4/ Clone meta-atmel layer with the proper branch ready.   
     git clone https://github.com/linux4sam/meta-atmel.git -b rocko
 
-5/ Clone meta-thornxt layer with the proper branch ready.  
+5/ Clone meta-thornxt layer with the proper branch ready.   
     git clone https://github.com/thorrockstar/meta-thornxt.git -b rocko
 
 6/ Enter the poky directory to configure the build system and start the build process.  
