@@ -57,13 +57,13 @@ Build procedure
     git clone git://git.openembedded.org/meta-openembedded -b warrior
 
 3/ Clone meta-qt5 git repository with the proper branch ready.
-    git clone git://github.com/meta-qt5/meta-qt5.git -b warrior
+    git clone https://github.com/meta-qt5/meta-qt5.git -b warrior
 
 4/ Clone meta-atmel layer with the proper branch ready.  
-    git clone git://github.com/linux4sam/meta-atmel.git -b warrior
+    git clone https://github.com/linux4sam/meta-atmel.git -b warrior
 
 5/ Clone meta-thornxt layer with the proper branch ready.  
-    git clone git://github.com/thorrockstar/meta-thornxt.git -b warrior
+    git clone https://github.com/thorrockstar/meta-thornxt.git -b warrior
 
 6/ Enter the poky directory to configure the build system and start the build process.  
    cd poky
