@@ -54,26 +54,27 @@ Build procedure
 mkdir my_dir
 cd my_dir
 
-1/ Clone yocto/poky git repository with the proper branch ready.
-git clone git://git.yoctoproject.org/poky
+1/ Clone yocto/poky git repository with the proper branch ready.  
+    git clone git://git.yoctoproject.org/poky -b krogoth
 
-2/ Clone meta-openembedded git repository with the proper branch ready.
-git clone git://git.openembedded.org/meta-openembedded
+2/ Clone meta-openembedded git repository with the proper branch ready.   
+    git clone git://git.openembedded.org/meta-openembedded -b krogoth
 
-3/ Clone meta-qt5 git repository with the proper branch ready
-git clone https://github.com/meta-qt5/meta-qt5.git
+3/ Clone meta-qt5 git repository with the proper branch ready.   
+    git clone https://github.com/meta-qt5/meta-qt5.git -b krogoth
 
-4/ Clone meta-atmel layer with the proper branch ready.
-git clone https://github.com/linux4sam/meta-atmel.git
+4/ Clone meta-atmel layer with the proper branch ready.   
+    git clone https://github.com/linux4sam/meta-atmel.git -b krogoth
 
-5/ Clone meta-thornxt layer with the proper branch ready.
-git clone https://github.com/thorrockstar/meta-thornxt.git
+5/ Clone meta-thornxt layer with the proper branch ready.   
+    git clone https://github.com/thorrockstar/meta-thornxt.git -b krogoth
 
-6/ Enter the poky directory to configure the build system and start the build process
-cd poky
+6/ Enter the poky directory to configure the build system and start the build process.  
+   cd poky
 
-7/ Initialize build directory
-source oe-init-build-env build-atmel
+7/ Initialize build directory and set compiler.  
+    export CROSS_COMPILE=arm-linux-gnueabi-  
+    source oe-init-build-env build-atmel
 
 8/ Add meta-thornxt layer to bblayer configuration file
 vim conf/bblayers.conf
