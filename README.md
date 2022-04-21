@@ -113,7 +113,7 @@ has been turned **off** as well as **'General Setup->Timers subsystem->Timer tic
 This should be done by the 'defconfig' but double check before building because it is cruicial.
 
 10/ Build Thor demo images  
-    bitbake atmel-xplained-demo-image
+    bitbake thor-nxt-image
 
 Typical bitbake output
 ======================
