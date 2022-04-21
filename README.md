@@ -61,13 +61,13 @@ git clone git://git.yoctoproject.org/poky
 git clone git://git.openembedded.org/meta-openembedded
 
 3/ Clone meta-qt5 git repository with the proper branch ready
-git clone git://github.com/meta-qt5/meta-qt5.git
+git clone https://github.com/meta-qt5/meta-qt5.git
 
 4/ Clone meta-atmel layer with the proper branch ready.
-git clone git://github.com/linux4sam/meta-atmel.git
+git clone https://github.com/linux4sam/meta-atmel.git
 
 5/ Clone meta-thornxt layer with the proper branch ready.
-git clone git://github.com/thorrockstar/meta-thornxt.git
+git clone https://github.com/thorrockstar/meta-thornxt.git
 
 6/ Enter the poky directory to configure the build system and start the build process
 cd poky
