@@ -77,7 +77,10 @@ cd my_dir
     source oe-init-build-env build-atmel
 
 8/ Add meta-thornxt layer to bblayer configuration file
-vim conf/bblayers.conf
+
+**Make sure that you have no white spaces left to "MACHINE ??=" and the other variables when editing the text block.**
+
+gedit conf/bblayers.conf
 
 BBPATH = "${TOPDIR}"
 BBFILES ?= ""
@@ -105,7 +108,9 @@ BLAYERS_NON_REMOVABLE ?= " \
 Pick one MACHINE name from the "Supported SoCs / MACHINE names" chapter above
 and edit the "local.conf" file. Here is an example:
 
-vim conf/local.conf
+**Make sure that you have no white spaces left to "MACHINE ??=" and the other variables when editing the text block.**
+
+gedit conf/local.conf
 [...]
 MACHINE ??= "sama5d3-xplained"
 [...]
