@@ -72,8 +72,11 @@ Build procedure
     export CROSS_COMPILE=arm-linux-gnueabi-  
     source oe-init-build-env build-atmel
 
-8/ Add meta-thornxt layer to bblayer configuration file.  
-    vi conf/bblayers.conf
+8/ Add meta-thornxt layer to bblayer configuration file.
+
+**Make sure that you have no white spaces left to "MACHINE ??=" and the other variables when editing the text block.**
+
+    gedit conf/bblayers.conf
 
     BBPATH = "${TOPDIR}"
     BBFILES ?= ""
@@ -98,8 +101,11 @@ Build procedure
 
 8/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
 Pick one MACHINE name from the "Supported SoCs / MACHINE names" chapter above
-and edit the "local.conf" file. Here is an example:  
-    vi conf/local.conf
+and edit the "local.conf" file. Here is an example:
+
+**Make sure that you have no white spaces left to "MACHINE ??=" and the other variables when editing the text block.**
+
+    gedit conf/local.conf
 
     [...]
     MACHINE ??= "sama5d3-xplained"
