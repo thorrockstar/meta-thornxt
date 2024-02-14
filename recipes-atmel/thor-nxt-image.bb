@@ -10,36 +10,36 @@ IMAGE_INSTALL += "\
     "
 
 # remove unwanted components from image
-IMAGE_INSTALL_remove = "\
-	mpg123 \
-	bash \
+IMAGE_INSTALL:remove = "\
+    mpg123 \
+    bash \
     bash-completion \
     nodejs \
     coreutils \
-	packagegroup-core-full-cmdline \
+    packagegroup-core-full-cmdline \
     packagegroup-base-bluetooth \
     packagegroup-base-usbgadget \
-	lmbench \
-	atmel-wireless-firmware \
+    lmbench \
+    atmel-wireless-firmware \
     hcitool \
-	dtc \
-	dtc-misc \
+    dtc \
+    dtc-misc \
     python \
     python2 \
     python3 \
     python-core \
     python2-core \
     python3-core \
-	python-pyserial \
-	python-smbus \
-	python-ctypes \
-	python-pip \
-	python-distribute \
-	python-pycurl \	
-	python-native \	
-	linux-firmware \
-	linux-firmware-atmel \
-	linux-firmware-atmel-license \
+    python-pyserial \
+    python-smbus \
+    python-ctypes \
+    python-pip \
+    python-distribute \
+    python-pycurl \	
+    python-native \	
+    linux-firmware \
+    linux-firmware-atmel \
+    linux-firmware-atmel-license \
     mchp-wireless-firmware \
     usbutils \
     evtest \
@@ -55,26 +55,26 @@ IMAGE_INSTALL_remove = "\
     gdb \
     btmon \
     tcpdump \
-	"
+    zeromq \
+    "
 
 # add important components to image
-IMAGE_INSTALL_append = "\
+IMAGE_INSTALL:append = "\
     glibc \
     glib-2.0 \
     gnutls \
-    zeromq \
     dbus \
     gdbserver \
     busybox \
     ca-certificates \
-	"
+    "
 
 CUSTOMFILESPATH_EXTRA := "${THISDIR}/images/files"
 
 ROOTFS_POSTPROCESS_COMMAND += " fix_udev_files ; fix_usr_files ; fix_firmware_files ; fix_interfaces_files ; cleanup_boot_overlay_files ; "
 
 cleanup_boot_overlay_files () {
-    rm -f $D/boot/*
+    rm -fr $D/boot/*
 }
 
 fix_udev_files () {
@@ -88,9 +88,12 @@ fix_udev_files () {
 
 fix_usr_files () {
     rm -fr $D/usr/games
-    rm -fr $D/usr/lib/python3.8
-    rm -fr $D/usr/include/python3.8
-    rm -f $D/usr/lib/libpython*.so.*
+    rm -fr $D/usr/bin/python*
+    rm -fr $D/usr/share/python*
+    rm -fr $D/usr/lib/python*
+    rm -fr $D/usr/include/python*
+    rm -fr $D/usr/lib/libpython*.so.*
+    rm -fr $D/usr/lib/libzmq*.so.*
 }
 
 fix_firmware_files () {

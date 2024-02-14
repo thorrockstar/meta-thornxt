@@ -1,7 +1,7 @@
 --- a/configs/sama5d3_xplainednf_uboot_defconfig	2021-11-22 10:14:31.304880117 +0100
 +++ b/configs/sama5d3_xplainednf_uboot_defconfig	2021-11-22 10:28:02.688922419 +0100
-@@ -11,8 +11,15 @@
- CONFIG_NANDFLASH=y
+@@ -13,8 +13,15 @@
+ CONFIG_CACHES=y
  # CONFIG_PMECC_AUTO_DETECT is not set
  CONFIG_PMECC_CORRECT_BITS_4=y
 -CONFIG_IMG_SIZE="0x000c0000"

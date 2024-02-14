@@ -1,20 +1,304 @@
 --- a/board/atmel/sama5d3_xplained/sama5d3_xplained.c
 +++ b/board/atmel/sama5d3_xplained/sama5d3_xplained.c
-@@ -13,11 +13,4600 @@
+@@ -1,13 +1,13 @@
+ // SPDX-License-Identifier: GPL-2.0+
+ /*
+- * Copyright (C) 2014 Atmel Corporation
+- *		      Bo Shen <voice.shen@atmel.com>
++ * Custom Boot picture for AT91 LCD Controller
+  */
+ 
++// Includes for HCLCD
++
+ #include <common.h>
+ #include <init.h>
+-#include <asm/global_data.h>
+-#include <asm/io.h>
++#include <configs/sama5d3_xplained.h>
+ #include <asm/arch/sama5d3_smc.h>
+ #include <asm/arch/at91_common.h>
+ #include <asm/arch/at91_rstc.h>
+@@ -15,11 +15,4810 @@
  #include <asm/arch/clk.h>
  #include <debug_uart.h>
  #include <spl.h>
-+#include <configs/sama5d3_xplained.h>
 +#include <spi.h>
-+#include <lcd.h>
-+#include <atmel_hlcdc.h>
 +#include "../drivers/spi/atmel_spi.h"
 +#include <linux/delay.h>
++#include <linux/bug.h>
  #include <asm/arch/atmel_mpddrc.h>
  #include <asm/arch/at91_wdt.h>
++#include <asm/global_data.h>
++#include <asm/io.h>
++#include <cpu_func.h>
++#include <log.h>
++#include <malloc.h>
++#include <part.h>
++#include <clk.h>
++#include <dm.h>
++#include <fdtdec.h>
++#include <wait_bit.h>
++#include <mapmem.h>
++#include <atmel_hlcdc.h>
++#include <atmel_lcd.h>
  
  DECLARE_GLOBAL_DATA_PTR;
  
++/* Calculate pixel bits */
++
++#define NBITS(bit_code) (1 << (bit_code))
++
++/* Start of framebuffer memory */
++
++void *lcd_base;
++
++/* HLCD configurable parameters */
++
++#define ATMEL_LCDC_CVAL_DEFAULT		0xc8
++#define ATMEL_LCDC_DMA_BURST_LEN	8
++#ifndef ATMEL_LCDC_GUARD_TIME
++#define ATMEL_LCDC_GUARD_TIME		1
++#endif
++
++#define ATMEL_LCDC_FIFO_SIZE		512
++
++#if LIFT_APP_THOR_NXT_GENERATION<3
++
++vidinfo_t panel_info = {
++	.vl_col = 800,
++	.vl_row = 480,
++	.vl_clk = 33333333,
++	.vl_bpix = LCD_BPP,
++	.vl_tft = 1,
++	.vl_hsync_len = 48,
++	.vl_left_margin = 40,
++	.vl_right_margin = 40,
++	.vl_sync = LCDC_LCDCFG5_HSPOL | LCDC_LCDCFG5_VSPOL,
++	.vl_vsync_len = 3,
++	.vl_upper_margin = 13,
++	.vl_lower_margin = 29,
++	.mmio = ATMEL_BASE_LCDC,
++};
++
++#else // #if LIFT_APP_THOR_NXT_GENERATION<3
++
++vidinfo_t panel_info = {
++	.vl_col = 480,
++	.vl_row = 960,
++	.vl_clk = 33333333,
++	.vl_bpix = LCD_BPP,
++	.vl_tft = 1,
++	.vl_hsync_len = 10,
++	.vl_left_margin = 30,
++	.vl_right_margin = 30,
++	.vl_sync = LCDC_LCDCFG5_HSPOL | LCDC_LCDCFG5_VSPOL,
++	.vl_vsync_len = 8,
++	.vl_upper_margin = 8,
++	.vl_lower_margin = 16,
++	.mmio = ATMEL_BASE_LCDC,
++};
++
++#endif // #else #if LIFT_APP_THOR_NXT_GENERATION<3
++
++void lcd_ctrl_init(void *lcd_base)
++{
++	unsigned long value;
++	struct lcd_dma_desc *desc;
++	struct atmel_hlcd_regs *regs;
++	int ret;
++
++	regs = (struct atmel_hlcd_regs *)panel_info.mmio;
++
++	/* Disable DISP signal */
++	writel(LCDC_LCDDIS_DISPDIS, &regs->lcdc_lcddis);
++	ret = wait_for_bit_le32(&regs->lcdc_lcdsr, LCDC_LCDSR_DISPSTS,
++				false, 1000, false);
++	if (ret)
++		printf("%s: %d: Timeout!\n", __func__, __LINE__);
++	/* Disable synchronization */
++	writel(LCDC_LCDDIS_SYNCDIS, &regs->lcdc_lcddis);
++	ret = wait_for_bit_le32(&regs->lcdc_lcdsr, LCDC_LCDSR_LCDSTS,
++				false, 1000, false);
++	if (ret)
++		printf("%s: %d: Timeout!\n", __func__, __LINE__);
++	/* Disable pixel clock */
++	writel(LCDC_LCDDIS_CLKDIS, &regs->lcdc_lcddis);
++	ret = wait_for_bit_le32(&regs->lcdc_lcdsr, LCDC_LCDSR_CLKSTS,
++				false, 1000, false);
++	if (ret)
++		printf("%s: %d: Timeout!\n", __func__, __LINE__);
++	/* Disable PWM */
++	writel(LCDC_LCDDIS_PWMDIS, &regs->lcdc_lcddis);
++	ret = wait_for_bit_le32(&regs->lcdc_lcdsr, LCDC_LCDSR_PWMSTS,
++				false, 1000, false);
++	if (ret)
++		printf("%s: %d: Timeout!\n", __func__, __LINE__);
++
++	/* Set pixel clock */
++	value = get_lcdc_clk_rate(0) / panel_info.vl_clk;
++	if (get_lcdc_clk_rate(0) % panel_info.vl_clk)
++		value++;
++
++	if (value < 1) {
++		/* Using system clock as pixel clock */
++		writel(LCDC_LCDCFG0_CLKDIV(0)
++			| LCDC_LCDCFG0_CGDISHCR
++			| LCDC_LCDCFG0_CGDISHEO
++			| LCDC_LCDCFG0_CGDISOVR1
++			| LCDC_LCDCFG0_CGDISBASE
++			| panel_info.vl_clk_pol
++			| LCDC_LCDCFG0_CLKSEL,
++			&regs->lcdc_lcdcfg0);
++
++	} else {
++		writel(LCDC_LCDCFG0_CLKDIV(value - 2)
++			| LCDC_LCDCFG0_CGDISHCR
++			| LCDC_LCDCFG0_CGDISHEO
++			| LCDC_LCDCFG0_CGDISOVR1
++			| LCDC_LCDCFG0_CGDISBASE
++			| panel_info.vl_clk_pol,
++			&regs->lcdc_lcdcfg0);
++	}
++
++	/* Initialize control register 5 */
++	value = 0;
++
++	value |= panel_info.vl_sync;
++
++	switch (LCD_OUTPUT_BPP) {
++	case 12:
++		value |= LCDC_LCDCFG5_MODE_OUTPUT_12BPP;
++		break;
++	case 16:
++		value |= LCDC_LCDCFG5_MODE_OUTPUT_16BPP;
++		break;
++	case 18:
++		value |= LCDC_LCDCFG5_MODE_OUTPUT_18BPP;
++		break;
++	case 24:
++		value |= LCDC_LCDCFG5_MODE_OUTPUT_24BPP;
++		break;
++	default:
++		BUG();
++		break;
++	}
++
++	value |= LCDC_LCDCFG5_GUARDTIME(ATMEL_LCDC_GUARD_TIME);
++	value |= (LCDC_LCDCFG5_DISPDLY | LCDC_LCDCFG5_VSPDLYS);
++	writel(value, &regs->lcdc_lcdcfg5);
++
++	/* Vertical & Horizontal Timing */
++	value = LCDC_LCDCFG1_VSPW(panel_info.vl_vsync_len - 1);
++	value |= LCDC_LCDCFG1_HSPW(panel_info.vl_hsync_len - 1);
++	writel(value, &regs->lcdc_lcdcfg1);
++
++	value = LCDC_LCDCFG2_VBPW(panel_info.vl_upper_margin);
++	value |= LCDC_LCDCFG2_VFPW(panel_info.vl_lower_margin - 1);
++	writel(value, &regs->lcdc_lcdcfg2);
++
++	value = LCDC_LCDCFG3_HBPW(panel_info.vl_left_margin - 1);
++	value |= LCDC_LCDCFG3_HFPW(panel_info.vl_right_margin - 1);
++	writel(value, &regs->lcdc_lcdcfg3);
++
++	/* Display size */
++	value = LCDC_LCDCFG4_RPF(panel_info.vl_row - 1);
++	value |= LCDC_LCDCFG4_PPL(panel_info.vl_col - 1);
++	writel(value, &regs->lcdc_lcdcfg4);
++
++	writel(LCDC_BASECFG0_BLEN_AHB_INCR4 | LCDC_BASECFG0_DLBO,
++	       &regs->lcdc_basecfg0);
++
++	switch (NBITS(panel_info.vl_bpix)) {
++	case 16:
++		writel(LCDC_BASECFG1_RGBMODE_16BPP_RGB_565,
++		       &regs->lcdc_basecfg1);
++		break;
++	case 32:
++		writel(LCDC_BASECFG1_RGBMODE_24BPP_RGB_888,
++		       &regs->lcdc_basecfg1);
++		break;
++	default:
++		BUG();
++		break;
++	}
++
++	writel(LCDC_BASECFG2_XSTRIDE(0), &regs->lcdc_basecfg2);
++	writel(0, &regs->lcdc_basecfg3);
++	writel(LCDC_BASECFG4_DMA, &regs->lcdc_basecfg4);
++
++	/* Disable all interrupts */
++	writel(~0UL, &regs->lcdc_lcdidr);
++	writel(~0UL, &regs->lcdc_baseidr);
++
++	/* Setup the DMA descriptor, this descriptor will loop to itself */
++	desc = (struct lcd_dma_desc *)(lcd_base - 16);
++
++	desc->address = (u32)lcd_base;
++	/* Disable DMA transfer interrupt & descriptor loaded interrupt. */
++	desc->control = LCDC_BASECTRL_ADDIEN | LCDC_BASECTRL_DSCRIEN
++			| LCDC_BASECTRL_DMAIEN | LCDC_BASECTRL_DFETCH;
++	desc->next = (u32)desc;
++
++	/* Flush the DMA descriptor if we enabled dcache */
++	flush_dcache_range((u32)desc, (u32)desc + sizeof(*desc));
++
++	writel(desc->address, &regs->lcdc_baseaddr);
++	writel(desc->control, &regs->lcdc_basectrl);
++	writel(desc->next, &regs->lcdc_basenext);
++	writel(LCDC_BASECHER_CHEN | LCDC_BASECHER_UPDATEEN,
++	       &regs->lcdc_basecher);
++
++	/* Enable LCD */
++	value = readl(&regs->lcdc_lcden);
++	writel(value | LCDC_LCDEN_CLKEN, &regs->lcdc_lcden);
++	ret = wait_for_bit_le32(&regs->lcdc_lcdsr, LCDC_LCDSR_CLKSTS,
++				true, 1000, false);
++	if (ret)
++		printf("%s: %d: Timeout!\n", __func__, __LINE__);
++	value = readl(&regs->lcdc_lcden);
++	writel(value | LCDC_LCDEN_SYNCEN, &regs->lcdc_lcden);
++	ret = wait_for_bit_le32(&regs->lcdc_lcdsr, LCDC_LCDSR_LCDSTS,
++				true, 1000, false);
++	if (ret)
++		printf("%s: %d: Timeout!\n", __func__, __LINE__);
++	value = readl(&regs->lcdc_lcden);
++	writel(value | LCDC_LCDEN_DISPEN, &regs->lcdc_lcden);
++	ret = wait_for_bit_le32(&regs->lcdc_lcdsr, LCDC_LCDSR_DISPSTS,
++				true, 1000, false);
++	if (ret)
++		printf("%s: %d: Timeout!\n", __func__, __LINE__);
++	value = readl(&regs->lcdc_lcden);
++	writel(value | LCDC_LCDEN_PWMEN, &regs->lcdc_lcden);
++	ret = wait_for_bit_le32(&regs->lcdc_lcdsr, LCDC_LCDSR_PWMSTS,
++				true, 1000, false);
++	if (ret)
++		printf("%s: %d: Timeout!\n", __func__, __LINE__);
++}
++
++int lcd_get_size(int *line_length)
++{
++	*line_length = (panel_info.vl_col * NBITS(panel_info.vl_bpix)) / 8;
++	return *line_length * panel_info.vl_row;
++}
++
++void lcd_sync(void)
++{
++    int line_length;
++
++    flush_dcache_range((ulong)lcd_base, (ulong)(lcd_base + lcd_get_size(&line_length)));
++}
++
++struct atmel_hlcdc_priv {
++	struct atmel_hlcd_regs *regs;
++	struct display_timing timing;
++	unsigned int vl_bpix;
++	unsigned int output_mode;
++	unsigned int guard_time;
++	ulong clk_rate;
++};
++
++// Atmel SPI support
++
 +struct atmel_spi_slave {
 +	struct spi_slave slave;
 +	void		*regs;
@@ -175,7 +459,6 @@
 +		return NULL;
 +	}
 +
-+
 +	scbr = (get_spi_clk_rate(bus) + max_hz - 1) / max_hz;
 +	if (scbr > ATMEL_SPI_CSRx_SCBR_MAX)
 +		/* Too low max SCK rate */
@@ -204,6 +487,7 @@
 +
 +	return &as->slave;
 +}
++
 +void spi_free_slave(struct spi_slave *slave)
 +{
 +	struct atmel_spi_slave *as = to_atmel_spi(slave);
@@ -329,10 +613,9 @@
 +#define APP_GET_BLUE_VALUE_565(x)  (x & 0x1F)
 +
 +/* Macros for creating a RGB-5:6:5 value. */
++
 +#define APP_MAKE_RGB_VALUE_565(r,g,b) ((r << 11) | (g << 5) | b)
 +#define APP_MAKE_RGB_VALUE_565_SWAP_BYTES(r,g,b) ((r << 3) | (g << 13) | (g >> 3) | (b << 8))
-+
-+
 +
 +/* Structure definition for the test picture. */
 +
@@ -4136,8 +4419,6 @@
 +    at91_set_pio_output(AT91_PIO_PORTE, 28, 0);              /* out: display SPI data/command selection */
 +}
 +
-+#ifdef CONFIG_LCD
-+
 +void thor_lcd_hw_init(void)
 +{
 +       at91_set_pio_output(AT91_PIO_PORTE, 12, 0);           /* PE12_BK_LIGHT */
@@ -4178,58 +4459,6 @@
 +	at91_periph_clk_enable(ATMEL_ID_LCDC);
 +}
 +
-+#if LIFT_APP_THOR_NXT_GENERATION<3
-+
-+vidinfo_t panel_info = {
-+	.vl_col = 800,
-+	.vl_row = 480,
-+	.vl_clk = 33333333,
-+	.vl_bpix = LCD_BPP,
-+	/*.vl_bpox = LCD_OUTPUT_BPP,*/
-+	.vl_tft = 1,
-+	.vl_hsync_len = 48,
-+	.vl_left_margin = 40,
-+	.vl_right_margin = 40,
-+	.vl_sync = LCDC_LCDCFG5_HSPOL | LCDC_LCDCFG5_VSPOL,
-+	.vl_vsync_len = 3,
-+	.vl_upper_margin = 13,
-+	.vl_lower_margin = 29,
-+	.mmio = ATMEL_BASE_LCDC,
-+};
-+
-+#else // #if LIFT_APP_THOR_NXT_GENERATION<3
-+
-+vidinfo_t panel_info = {
-+	.vl_col = 480,
-+	.vl_row = 960,
-+	.vl_clk = 33333333,
-+	.vl_bpix = LCD_BPP,
-+	/*.vl_bpox = LCD_OUTPUT_BPP,*/
-+	.vl_tft = 1,
-+	.vl_hsync_len = 10,
-+	.vl_left_margin = 30,
-+	.vl_right_margin = 30,
-+	.vl_sync = LCDC_LCDCFG5_HSPOL | LCDC_LCDCFG5_VSPOL,
-+	.vl_vsync_len = 8,
-+	.vl_upper_margin = 8,
-+	.vl_lower_margin = 16,
-+	.mmio = ATMEL_BASE_LCDC,
-+};
-+
-+#endif // #else #if LIFT_APP_THOR_NXT_GENERATION<3
-+
-+void lcd_enable(void)
-+{
-+}
-+
-+void lcd_disable(void)
-+{
-+}
-+
-+#ifdef CONFIG_LCD_INFO
-+
-+extern void *lcd_base;    /* Start of framebuffer memory */
-+
 +void lcd_show_board_info(void)
 +{
 +    int wd, hg, md;
@@ -4238,7 +4467,7 @@
 +
 +    printf("\nTrigger splash image on HCLCD.\n");
 +
-+    /* Copy bitmap to frame buffer, scale size twice. */
++    /* Copy bitmap to frame buffer. */
 +
 +    dw = (unsigned short*) lcd_base;
 +
@@ -4341,14 +4570,13 @@
 +            
 +        mdelay(50);
 +        at91_set_pio_output(AT91_PIO_PORTE, 12, 1); /* PE12_BK_LIGHT */
-+#endif // #else#if LIFT_APP_THOR_NXT_GENERATION<3
++        
++#endif // #else #if LIFT_APP_THOR_NXT_GENERATION<3
++
 +        mdelay(750);
 +        at91_set_pio_output(AT91_PIO_PORTE, 12, 0); /* PE12_BK_LIGHT */
 +    }
 +}
-+
-+#endif /* CONFIG_LCD_INFO */
-+#endif /* CONFIG_LCD */
 +
 +/* Transfer data via SPI. */
 +
@@ -4601,7 +4829,7 @@
  extern void at91_pda_detect(void);
  
  #ifdef CONFIG_NAND_ATMEL
-@@ -60,13 +4340,6 @@
+@@ -62,13 +4861,6 @@
  }
  #endif
  
@@ -4615,34 +4843,120 @@
  #ifdef CONFIG_DEBUG_UART_BOARD_INIT
  void board_debug_uart_init(void)
  {
-@@ -100,12 +4373,23 @@
- #ifdef CONFIG_NAND_ATMEL
- 	sama5d3_xplained_nand_hw_init();
+@@ -87,31 +4879,101 @@
+ #ifdef CONFIG_BOARD_EARLY_INIT_F
+ int board_early_init_f(void)
+ {
++#ifdef CONFIG_DEBUG_UART
++	debug_uart_init();
++#endif
+ 	return 0;
+ }
  #endif
+ 
++/*
++ * This is called early in the system initialization to grab memory
++ * for the LCD controller.
++ * Returns new address for monitor, after reserving LCD buffer memory
++ *
++ * Note that this is running from ROM, so no write access to global data.
++ */
++ulong lcd_setmem(ulong addr)
++{
++	ulong size;
++	int line_length;
++
++	printf("\nLCD panel info: %d x %d, %d bit/pix\n", panel_info.vl_col,
++		panel_info.vl_row, NBITS(panel_info.vl_bpix));
++
++	size = lcd_get_size(&line_length);
++
++	/* Round up to nearest full page, or MMU section if defined */
++	size = ALIGN(size, PAGE_SIZE);
++	addr = ALIGN(addr - PAGE_SIZE + 1, PAGE_SIZE);
++
++	/* Allocate pages for the frame buffer. */
++	addr -= size;
++
++	printf("Reserving %ldk for LCD Framebuffer at: %08lx\n",
++	      size >> 10, addr);
++
++	return addr;
++}
++
++/*
++ * Initialize the SAMA5D3 based board.
++ */
++
+ int board_init(void)
+ {
+-	/* adress of boot parameters */
+-	gd->bd->bi_boot_params = CFG_SYS_SDRAM_BASE + 0x100;
++    /* adress of boot parameters */
++    
++    gd->bd->bi_boot_params = CFG_SYS_SDRAM_BASE + 0x100;
+ 
+-#ifdef CONFIG_NAND_ATMEL
+-	sama5d3_xplained_nand_hw_init();
++    sama5d3_xplained_nand_hw_init();
 +
 +    thor_gpio_init();
 +
-+#ifdef CONFIG_LCD
 +    thor_lcd_hw_init();
++    
++    mdelay(100);
 +
 +#if LIFT_APP_THOR_NXT_GENERATION==3
++
 +    at91_spi1_hw_init(1 << 0 /*CS*/);
 +    at91_spi1_hw_bootpic();
-+#endif
-+
-+    drv_lcd_init(); // Should be called by stdio.c but is not in this version!
-+#endif /* ifdef CONFIG_LCD */
-+
- #ifdef CONFIG_CMD_USB
- 	sama5d3_xplained_usb_hw_init();
++    
  #endif
++
++    mdelay(100);
++
++    //lcd_base = gd->relocaddr;
++    //gd->relocaddr = lcd_setmem(lcd_base);
++    lcd_base = map_sysmem(0x23E00000, 0); // 0x23E00000 CONFIG_SAMA5D3_LCD_BASE
++    
++    printf("\nInitialize frame buffer at %p.\n", lcd_base);
++    
++    lcd_ctrl_init(lcd_base);
++
++    printf("\nClear frame buffer.\n");
++
++    const int lcwd = panel_info.vl_col;
++    const int lchg = panel_info.vl_row;
++
++    memset(lcd_base, 0, (lcwd*lchg) << 1);
++
++    mdelay(50);
++    
+ #ifdef CONFIG_CMD_USB
+-	sama5d3_xplained_usb_hw_init();
+-#endif
 -#ifdef CONFIG_GENERIC_ATMEL_MCI
 -	sama5d3_xplained_mci0_hw_init();
--#endif
- 	return 0;
++
++    sama5d3_xplained_usb_hw_init();
++	
+ #endif
+-	return 0;
++
++    lcd_show_board_info();
++
++    return 0;
  }
  
-@@ -122,9 +4402,6 @@
+ int dram_init(void)
+ {
+-	gd->ram_size = get_ram_size((void *)CFG_SYS_SDRAM_BASE,
+-				    CFG_SYS_SDRAM_SIZE);
++	gd->ram_size = get_ram_size((void *)CFG_SYS_SDRAM_BASE, CFG_SYS_SDRAM_SIZE);
+ 
+ 	return 0;
+ }
+@@ -121,9 +4983,6 @@
  void spl_board_init(void)
  {
  #ifdef CONFIG_SD_BOOT
@@ -4651,4 +4965,10 @@
 -#endif
  #elif CONFIG_NAND_BOOT
  	sama5d3_xplained_nand_hw_init();
+ #endif
+@@ -205,4 +5064,5 @@
+ 	      AT91_PMC_MCKR_CSS_PLLA;
+ 	at91_mck_init(tmp);
+ }
++
  #endif
