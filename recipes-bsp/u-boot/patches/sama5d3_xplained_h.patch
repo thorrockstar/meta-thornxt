@@ -13,7 +13,6 @@
  /*
   * This needs to be defined for the OHCI code to work but it is defined as
   * ATMEL_ID_UHPHS in the CPU specific header files.
-<<<<<<< HEAD
 @@ -27,6 +33,13 @@
  #define CFG_SYS_SDRAM_BASE           0x20000000
  #define CFG_SYS_SDRAM_SIZE		0x10000000
@@ -23,41 +22,18 @@
 +//#define CONFIG_LCD
 +//#define CONFIG_LCD_INFO
 +#define LCD_BPP 4 // 16 bit colour depth
-=======
-@@ -34,6 +40,13 @@
- 	(CONFIG_SYS_SDRAM_BASE + 16 * 1024 - GENERATED_GBL_DATA_SIZE)
- #endif
- 
-+/* SPI/LCD for boot picture */
-+#define CONFIG_ATMEL_HLCD
-+#define CONFIG_LCD
-+#define CONFIG_LCD_INFO
-+#define LCD_BPP LCD_COLOR16
->>>>>>> 00fff611b3a941816c8a725caa61e45b5224d647
 +#define LCD_OUTPUT_BPP 24
 +
  /* NAND flash */
  #ifdef CONFIG_CMD_NAND
-<<<<<<< HEAD
  #define CFG_SYS_NAND_BASE		0x60000000
 @@ -40,6 +53,9 @@
  
  /* size of u-boot.bin to load */
-=======
- #define CONFIG_SYS_MAX_NAND_DEVICE	1
-@@ -69,6 +82,9 @@
- #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME	"u-boot.img"
- #endif
->>>>>>> 00fff611b3a941816c8a725caa61e45b5224d647
  
 +#define CONFIG_SYS_NAND_U_BOOT_OFFS	0x10000
 +#define CONFIG_SYS_NAND_U_BOOT_SIZE	0xB0000
 +
  /* Falcon boot support on raw MMC */
-<<<<<<< HEAD
  /* U-Boot proper stored by default at 0x200 (256 KiB) */
  
-=======
- #define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTOR	0x100  /* 128 KiB */
- #define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTORS	(CONFIG_CMD_SPL_WRITE_SIZE / 512)
->>>>>>> 00fff611b3a941816c8a725caa61e45b5224d647

@@ -1,12 +1,7 @@
 --- a/configs/sama5d3_xplained_nandflash_defconfig
 +++ b/configs/sama5d3_xplained_nandflash_defconfig
-<<<<<<< HEAD
 @@ -28,9 +28,10 @@
  CONFIG_ENV_VARS_UBOOT_CONFIG=y
-=======
-@@ -24,9 +24,10 @@
- CONFIG_SYS_LOAD_ADDR=0x22000000
->>>>>>> 00fff611b3a941816c8a725caa61e45b5224d647
  CONFIG_FIT=y
  CONFIG_NAND_BOOT=y
 -CONFIG_BOOTDELAY=3
@@ -15,17 +10,10 @@
 -CONFIG_BOOTARGS="console=ttyS0,115200 earlyprintk mtdparts=atmel_nand:256k(bootstrap)ro,768k(uboot)ro,256K(env_redundant),256k(env),512k(dtb),6M(kernel)ro,-(rootfs) rootfstype=ubifs ubi.mtd=6 root=ubi0:rootfs"
 +CONFIG_BOOTARGS="console=ttyS0,115200 mtdparts=atmel_nand:64k(bootstrap)ro,704k(uboot)ro,256k(env),256k(env_redundant),256k(spare),512k(dtb),6M(kernel)ro,-(rootfs) rootfstype=ubifs ubi.mtd=7 root=ubi0:rootfs rw"
 +CONFIG_SYS_USE_NANDFLASH=y
-<<<<<<< HEAD
  CONFIG_USE_BOOTCOMMAND=y
  CONFIG_BOOTCOMMAND="nand read 0x21000000 0x180000 0x80000;nand read 0x22000000 0x200000 0x600000;bootz 0x22000000 - 0x21000000"
  # CONFIG_DISPLAY_BOARDINFO is not set
 @@ -50,21 +51,22 @@
-=======
- # CONFIG_DISPLAY_BOARDINFO is not set
- CONFIG_SPL_NAND_SUPPORT=y
- CONFIG_SPL_NAND_DRIVERS=y
-@@ -35,20 +36,21 @@
->>>>>>> 00fff611b3a941816c8a725caa61e45b5224d647
  CONFIG_CMD_BOOTZ=y
  # CONFIG_CMD_FLASH is not set
  # CONFIG_CMD_LOADS is not set
@@ -56,11 +44,7 @@
  CONFIG_OF_CONTROL=y
  CONFIG_SPL_OF_CONTROL=y
  CONFIG_OF_SPL_REMOVE_PROPS="interrupts interrupt-parent dmas dma-names"
-<<<<<<< HEAD
 @@ -79,7 +81,8 @@
-=======
-@@ -64,7 +66,8 @@
->>>>>>> 00fff611b3a941816c8a725caa61e45b5224d647
  CONFIG_AT91_UTMI=y
  CONFIG_AT91_H32MX=y
  CONFIG_AT91_GPIO=y
@@ -70,20 +54,12 @@
  CONFIG_MTD=y
  CONFIG_NAND_ATMEL=y
  CONFIG_PMECC_CAP=4
-<<<<<<< HEAD
 @@ -90,13 +93,14 @@
  CONFIG_SYS_NAND_PAGE_SIZE=0x800
  CONFIG_SYS_NAND_OOBSIZE=0x40
  CONFIG_SYS_NAND_U_BOOT_LOCATIONS=y
 -CONFIG_SYS_NAND_U_BOOT_OFFS=0x40000
 +CONFIG_SYS_NAND_U_BOOT_OFFS=0x10000
-=======
-@@ -76,13 +79,13 @@
- CONFIG_SYS_NAND_OOBSIZE=0x40
- CONFIG_SYS_NAND_U_BOOT_LOCATIONS=y
- CONFIG_SYS_NAND_U_BOOT_OFFS=0x40000
--CONFIG_DM_ETH=y
->>>>>>> 00fff611b3a941816c8a725caa61e45b5224d647
 +CONFIG_DM_ETH=n
  CONFIG_MACB=y
  CONFIG_PINCTRL=y
@@ -93,15 +69,9 @@
 -CONFIG_DEBUG_UART_ANNOUNCE=y
 +CONFIG_DEBUG_UART_ANNOUNCE=n
  CONFIG_ATMEL_USART=y
-<<<<<<< HEAD
  CONFIG_SYSRESET=y
  CONFIG_SPL_SYSRESET=y
 @@ -105,12 +109,80 @@
-=======
- CONFIG_TIMER=y
- CONFIG_SYSRESET=y
-@@ -92,11 +95,77 @@
->>>>>>> 00fff611b3a941816c8a725caa61e45b5224d647
  CONFIG_SPL_TIMER=y
  CONFIG_ATMEL_PIT_TIMER=y
  CONFIG_SPL_ATMEL_PIT_TIMER=y
@@ -115,11 +85,6 @@
 -CONFIG_W1=y
 -CONFIG_W1_GPIO=y
 -CONFIG_W1_EEPROM=y
-<<<<<<< HEAD
-=======
-+CONFIG_USB=n
-+CONFIG_USB_EHCI_HCD=n
->>>>>>> 00fff611b3a941816c8a725caa61e45b5224d647
 +CONFIG_USB_STORAGE=n
 +CONFIG_EFI_LOADER=n
 +CONFIG_CMD_BOOTEFI=n
