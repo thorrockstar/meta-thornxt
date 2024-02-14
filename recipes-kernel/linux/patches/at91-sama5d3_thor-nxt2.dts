@@ -187,7 +187,7 @@
 				};
 			};
 
-			aes@f8038000 {
+			aes: crypto@f8038000 {
 				dmas = <0>, <0>;	/* Do not use DMA for aes */
 				status = "disabled";
 			};

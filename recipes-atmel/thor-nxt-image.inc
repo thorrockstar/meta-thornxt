@@ -1,4 +1,4 @@
-IMAGE_FEATURES += "ssh-server-openssh package-management"
+IMAGE_FEATURES += "ssh-server-openssh"
 
 IMAGE_INSTALL = "\
     packagegroup-core-boot \
@@ -7,9 +7,6 @@ IMAGE_INSTALL = "\
     setserial \
     opkg \
     iperf3 \
-    \
-    nbench-byte \
-    \
     alsa-utils \
     i2c-tools \
     devmem2 \
