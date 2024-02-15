@@ -6,7 +6,7 @@ QTNAME = "qte"
 QT_DIR_NAME = "qtopia"
 QT_TOOLS_PREFIX = "$OECORE_NATIVE_SYSROOT${bindir_nativesdk}"
 
-create_sdk_files_append() {
+create_sdk_files:append() {
     mkdir -p ${SDK_OUTPUT}${SDKPATHNATIVE}/environment-setup.d/
     script=${SDK_OUTPUT}${SDKPATHNATIVE}/environment-setup.d/${QT_DIR_NAME}.sh
 
@@ -35,7 +35,7 @@ create_sdk_files_append() {
 }
 
 # remove unwanted components from image
-IMAGE_INSTALL_remove = "\
+IMAGE_INSTALL:remove = "\
     mpg123 \
     bash \
     bash-completion \
@@ -83,7 +83,7 @@ IMAGE_INSTALL_remove = "\
     "
 
 # add important components to image
-IMAGE_INSTALL_append = "\
+IMAGE_INSTALL:append = "\
     glibc \
     glib-2.0 \
     gnutls \

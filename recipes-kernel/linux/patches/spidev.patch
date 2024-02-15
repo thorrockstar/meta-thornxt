@@ -1,11 +1,18 @@
 --- a/drivers/spi/spidev.c
 +++ b/drivers/spi/spidev.c
-@@ -662,6 +662,7 @@
-	{ .compatible = "lineartechnology,ltc2488" },
-	{ .compatible = "ge,achc" },
-	{ .compatible = "semtech,sx1301" },
-+	{ .compatible = "linux,spidev" },
-	{ .compatible = "lwn,bk4" },
-	{ .compatible = "dh,dhcom-board" },
-	{ .compatible = "menlo,m53cpld" },
-
+@@ -700,6 +700,7 @@
+ 	{ .name = "m53cpld" },
+ 	{ .name = "spi-petra" },
+ 	{ .name = "spi-authenta" },
++	{ .name = "spidev" },
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(spi, spidev_spi_ids);
+@@ -721,6 +722,7 @@
+ 	{ .compatible = "rohm,dh2228fv", .data = &spidev_of_check },
+ 	{ .compatible = "lineartechnology,ltc2488", .data = &spidev_of_check },
+ 	{ .compatible = "semtech,sx1301", .data = &spidev_of_check },
++	{ .compatible = "linux,spidev", .data = &spidev_of_check },
+ 	{ .compatible = "lwn,bk4", .data = &spidev_of_check },
+ 	{ .compatible = "dh,dhcom-board", .data = &spidev_of_check },
+ 	{ .compatible = "menlo,m53cpld", .data = &spidev_of_check },

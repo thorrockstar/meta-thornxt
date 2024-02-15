@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/patches:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/patches:"
 
 SRC_URI += " \
 	file://defconfig_thor \
@@ -14,12 +14,12 @@ SRC_URI += " \
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-MACHINE_FEATURES_remove = "camera"
+MACHINE_FEATURES:remove = "camera"
 
 KERNEL_DEVICETREE += "at91-sama5d3_thor-nxt2.dtb"
 KERNEL_DEVICETREE += "at91-sama5d3_thor-nxt3.dtb"
 
-do_configure_prepend() {
+do_configure:prepend() {
     mv ${WORKDIR}/defconfig_thor ${WORKDIR}/defconfig
     cp ${WORKDIR}/defconfig ${WORKDIR}/build/.config
 }
