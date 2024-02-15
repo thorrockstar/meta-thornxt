@@ -108,9 +108,19 @@ and edit the "local.conf" file. Here is an example:
     [...]
     PACKAGE_CLASSES ?= "package_ipk"
     [...]
-    USER_CLASSES ?= "buildstats image-mklibs"
+    USER_CLASSES ?= "buildstats"
     [...]
-    DISTRO = "poky-atmel"
+    INIT_MANAGER = "sysvinit"
+    [...]
+    DISTRO ?= "poky-atmel"
+    [...]
+    ENABLE_BINARY_LOCALE_GENERATION = "1"
+    [...]
+    GLIBC_SPLIT_LC_PACKAGES = "0"
+    [...]
+    GLIBC_GENERATE_LOCALES += "en_US.UTF-8"
+    [...]
+    IMAGE_LINGUAS += "en-us"
 
 **IMPORTANT**
 
