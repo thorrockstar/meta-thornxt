@@ -243,7 +243,7 @@
 				pinctrl-names = "default";
 				pinctrl-0 = <&pinctrl_pck0_as_audio_mck>;
 
-				atmel,model = "ssm2518 @ THORNXT";
+				atmel,model = "ssm2518THORNXT";
 				atmel,audio-routing =
 					"Speaker Out", "OUTL",
 					"Speaker Out", "OUTR";
@@ -373,7 +373,6 @@
 
 			panel_input: endpoint@0 {
 				reg = <0>;
-				remote-endpoint = <&hlcdc_panel_output>;
 			};
 		};
 	};
