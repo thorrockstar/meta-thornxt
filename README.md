@@ -123,7 +123,14 @@ and edit the "local.conf" file. Here is an example:
     INIT_MANAGER = "sysvinit"
     [...]
     DISTRO ?= "poky-atmel"
-
+    [...]
+    ENABLE_BINARY_LOCALE_GENERATION = "1"
+    [...]
+    GLIBC_SPLIT_LC_PACKAGES = "0"
+    [...]
+    GLIBC_GENERATE_LOCALES += "en_US.UTF-8"
+    [...]
+    IMAGE_LINGUAS += "en-us"
 
 **IMPORTANT**
 
