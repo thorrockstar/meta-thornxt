@@ -47,30 +47,38 @@ Build procedure
 ===============
 
 0/ Create a directory.  
-    mkdir poky  
-    cd poky
+    mkdir kirkstone_sama
+    cd kirkstone_sama
 
 1/ Clone yocto/poky git repository with the proper branch ready.  
-    git clone git://git.yoctoproject.org/poky -b dunfell
+    git clone https://git.yoctoproject.org/poky && cd poky && git checkout -b kirkstone yocto-4.0.13 && cd -
 
 2/ Clone meta-openembedded git repository with the proper branch ready.  
-    git clone git://git.openembedded.org/meta-openembedded -b dunfell
+    git clone git://git.openembedded.org/meta-openembedded && cd meta-openembedded && git checkout -b kirkstone 79a6f6 && cd -
 
 3/ Clone meta-atmel layer with the proper branch ready.  
-    git clone https://github.com/linux4sam/meta-atmel.git -b dunfell
+    git clone https://github.com/linux4sam/meta-atmel.git -b kirkstone
 
-4/ Clone meta-thornxt layer with the proper branch ready.  
-    git clone https://github.com/thorrockstar/meta-thornxt.git -b dunfell
+4/ Clone meta-arm layer with the proper branch ready
+    git clone https://git.yoctoproject.org/meta-arm && cd meta-arm && git checkout -b kirkstone yocto-4.0.1 && cd -
 
-5/ Enter the poky directory to configure the build system and start the build process.  
+5/ Clone meta-thornxt layer with the proper branch ready.  
+    git clone https://github.com/thorrockstar/meta-thornxt.git -b kirkstone
+
+6/ Enter the poky directory to configure the build system and start the build process.  
    cd poky
 
-6/ Initialize build directory and set compiler.  
-    source oe-init-build-env build-atmel
+7/ Inside the .templateconf file, you will need to modify the TEMPLATECONF variable to match the path to the meta-atmel layer "conf" directory:
+   gedit .templateconf
 
-7/ Add meta-thornxt layer to bblayer configuration file.
+   export TEMPLATECONF=${TEMPLATECONF:-../meta-atmel/conf}
 
-**Make sure that you have no white spaces left to "MACHINE ??=" and the other variables when editing the text block.**
+8/ Initialize build directory and set compiler.  
+    source oe-init-build-env build-microchip
+
+9/ Add meta-thornxt layer to bblayer configuration file.
+
+**Make sure that you have no white spaces left to "BBLAYERS ?=" and the other variables when editing the text block.**
 
     gedit conf/bblayers.conf
 
@@ -83,11 +91,13 @@ Build procedure
       ${BSPDIR}/poky/meta \
       ${BSPDIR}/poky/meta-poky \
       ${BSPDIR}/poky/meta-yocto-bsp \
-      ${BSPDIR}/meta-atmel \
-      ${BSPDIR}/meta-thornxt \
       ${BSPDIR}/meta-openembedded/meta-oe \
       ${BSPDIR}/meta-openembedded/meta-networking \
       ${BSPDIR}/meta-openembedded/meta-python \
+      ${BSPDIR}/meta-atmel \
+      ${BSPDIR}/meta-thornxt \
+      ${BSPDIR}/meta-arm/meta-arm \
+      ${BSPDIR}/meta-arm/meta-arm-toolchain \
       "
 
     BLAYERS_NON_REMOVABLE ?= " \
@@ -95,9 +105,9 @@ Build procedure
       ${BSPDIR}/poky/meta-poky \
       "
 
-8/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
+10/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
 Pick one MACHINE name from the "Supported SoCs / MACHINE names" chapter above
-and edit the "local.conf" file. Here is an example:
+and edit the "local.conf" file. Here is an example:  
 
 **Make sure that you have no white spaces left to "MACHINE ??=" and the other variables when editing the text block.**
 
@@ -124,33 +134,35 @@ and edit the "local.conf" file. Here is an example:
 
 **IMPORTANT**
 
-9/ Double check that in the kernel configuration **'General Setup->Timers subsystem->High Resolution Timer Support'**
+11/ Double check that in the kernel configuration **'General Setup->Timers subsystem->High Resolution Timer Support'**
 has been turned **off** as well as **'General Setup->Timers subsystem->Timer tick handling'** is set to **'Periodic timer ticks'**.
 This should be done by the 'defconfig' but double check before building because it is cruicial.
 
-10/ Build Thor demo images  
+12/ Build Thor demo images  
     bitbake thor-nxt-image
 
 Typical bitbake output
 ======================
     Build Configuration:
-    BB_VERSION           = "1.46.0"
+    BB_VERSION           = "2.0.0"
     BUILD_SYS            = "x86_64-linux"
     NATIVELSBSTRING      = "universal"
     TARGET_SYS           = "arm-poky-linux-gnueabi"
     MACHINE              = "sama5d3-xplained"
     DISTRO               = "poky-atmel"
-    DISTRO_VERSION       = "3.1.13"
+    DISTRO_VERSION       = "4.0.13"
     TUNE_FEATURES        = "arm vfp cortexa5 thumb callconvention-hard"
     TARGET_FPU           = "hard"
     meta                 
     meta-poky            
-    meta-yocto-bsp       = "dunfell:795339092f87672e4f68e4d3bc4cfd0e252d1831"
-    meta-atmel           = "dunfell:20eeec4910f1214b9099f5276a944e5d281b70ee"
-    meta-thornxt         = "dunfell:96c8dcd70f12b45a8b8f6071b440e09d65fd8c06"
+    meta-yocto-bsp       = "kirkstone:e51bf557f596c4da38789a948a3228ba11455e3c"
     meta-oe              
     meta-networking      
-    meta-python          = "dunfell:69f94af4d91215e7d4e225bab54bf3bcfee42f1c"
+    meta-python          = "kirkstone:79a6f60dabad9e5b0e041efa91379447ef030482"
+    meta-atmel           = "kirkstone:128bf04cb75902e239a145f0e84f6147aef2ff4b"
+    meta-thornxt         = "kirkstone:96c8dcd70f12b45a8b8f6071b440e09d65fd8c06"
+    meta-arm             
+    meta-arm-toolchain   = "kirkstone:bafd1d013c2470bcec123ba4eb8232ab879b2660"
 
 Contributing
 ============
