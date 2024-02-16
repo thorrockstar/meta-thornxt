@@ -13,29 +13,27 @@
  /*
   * This needs to be defined for the OHCI code to work but it is defined as
   * ATMEL_ID_UHPHS in the CPU specific header files.
-@@ -34,6 +40,15 @@
+@@ -34,6 +40,13 @@
  	(CONFIG_SYS_SDRAM_BASE + 16 * 1024 - GENERATED_GBL_DATA_SIZE)
  #endif
  
 +/* SPI/LCD for boot picture */
-+//#define CONFIG_ATMEL_SPI
 +#define CONFIG_ATMEL_HLCD
 +#define CONFIG_LCD
 +#define CONFIG_LCD_INFO
 +#define LCD_BPP LCD_COLOR16
 +#define LCD_OUTPUT_BPP 24
-+//#define CONFIG_SYS_WHITE_ON_BLACK
 +
  /* NAND flash */
  #ifdef CONFIG_CMD_NAND
  #define CONFIG_SYS_MAX_NAND_DEVICE	1
-@@ -71,7 +86,8 @@
- #ifdef CONFIG_SD_BOOT
+@@ -69,6 +82,9 @@
  #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME	"u-boot.img"
  #endif
--#define CONFIG_SYS_NAND_U_BOOT_OFFS	0x40000
+ 
 +#define CONFIG_SYS_NAND_U_BOOT_OFFS	0x10000
 +#define CONFIG_SYS_NAND_U_BOOT_SIZE	0xB0000
- #define CONFIG_SYS_NAND_5_ADDR_CYCLE
- #define CONFIG_SYS_NAND_PAGE_SIZE	0x800
- #define CONFIG_SYS_NAND_PAGE_COUNT	64
++
+ /* Falcon boot support on raw MMC */
+ #define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTOR	0x100  /* 128 KiB */
+ #define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTORS	(CONFIG_CMD_SPL_WRITE_SIZE / 512)
