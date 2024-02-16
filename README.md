@@ -57,10 +57,10 @@ Build procedure
     git clone git://git.openembedded.org/meta-openembedded -b dunfell
 
 3/ Clone meta-atmel layer with the proper branch ready.  
-    git clone git://github.com/linux4sam/meta-atmel.git -b dunfell
+    git clone https://github.com/linux4sam/meta-atmel.git -b dunfell
 
 4/ Clone meta-thornxt layer with the proper branch ready.  
-    git clone git://github.com/thorrockstar/meta-thornxt.git -b dunfell
+    git clone https://github.com/thorrockstar/meta-thornxt.git -b dunfell
 
 5/ Enter the poky directory to configure the build system and start the build process.  
    cd poky
@@ -68,8 +68,11 @@ Build procedure
 6/ Initialize build directory and set compiler.  
     source oe-init-build-env build-atmel
 
-7/ Add meta-thornxt layer to bblayer configuration file.  
-    vi conf/bblayers.conf
+7/ Add meta-thornxt layer to bblayer configuration file.
+
+**Make sure that you have no white spaces left to "BBLAYERS ?=" and the other variables when editing the text block.**
+
+    gedit conf/bblayers.conf
 
     BBPATH = "${TOPDIR}"
     BBFILES ?= ""
@@ -95,7 +98,10 @@ Build procedure
 8/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
 Pick one MACHINE name from the "Supported SoCs / MACHINE names" chapter above
 and edit the "local.conf" file. Here is an example:  
-    vi conf/local.conf
+
+**Make sure that you have no white spaces left to "MACHINE ??=" and the other variables when editing the text block.**
+
+    gedit conf/local.conf
 
     [...]
     MACHINE ??= "sama5d3-xplained"
@@ -113,7 +119,7 @@ has been turned **off** as well as **'General Setup->Timers subsystem->Timer tic
 This should be done by the 'defconfig' but double check before building because it is cruicial.
 
 10/ Build Thor demo images  
-    bitbake atmel-xplained-demo-image
+    bitbake thor-nxt-image
 
 Typical bitbake output
 ======================
