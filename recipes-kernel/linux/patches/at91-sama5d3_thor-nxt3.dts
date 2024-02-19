@@ -48,7 +48,6 @@
 				cs-gpios = <&pioC 25 0>;
 				pinctrl-names = "default", "cs";
 				pinctrl-1 = <&pinctrl_spi1_cs>;
-				dmas = <0>, <0>;
 				status = "okay";
 				spidev@0 {
 					compatible = "linux,spidev";

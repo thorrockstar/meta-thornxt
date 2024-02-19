@@ -10,6 +10,7 @@ SRC_URI += " \
 	file://at91_can.patch;patch=1 \
 	file://at91-sama5d3_thor-nxt2.dts;subdir=git/arch/${ARCH}/boot/dts \
 	file://at91-sama5d3_thor-nxt3.dts;subdir=git/arch/${ARCH}/boot/dts \
+	file://at_hdmac.patch;patch=1 \
 "
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
