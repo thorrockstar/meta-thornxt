@@ -13,7 +13,7 @@ https://www.linux4sam.org
 
 Supported SoCs / MACHINE names
 ==============================
-- SAMA5D3 based THOR-NX-T2/3 lift controller boards
+- SAMA5D3 based THOR-NX-T2/3(Nova) and Nous lift controller boards
 
 
 Sources
@@ -43,37 +43,58 @@ URI: git://github.com/meta-qt5/meta-qt5.git
 URI: https://github.com/meta-qt5/meta-qt5
 
 
+Requisities
+===========
+
+Build has been tested under Ubuntu 22.04 LTS. Anyway you need to install these required packages:
+
+    $ sudo apt install gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev python3-subunit mesa-common-dev zstd liblz4-tool file locales libacl1
+    $ sudo locale-gen en_US.UTF-8
+
+    $ sudo apt install make python3-pip inkscape texlive-latex-extra
+    $ sudo pip3 install sphinx sphinx_rtd_theme pyyaml
+
+
 Build procedure
 ===============
 
 0/ Create a directory.  
+
     mkdir kirkstone_sama
     cd kirkstone_sama
 
 1/ Clone yocto/poky git repository with the proper branch ready.  
+
     git clone https://git.yoctoproject.org/poky && cd poky && git checkout -b kirkstone yocto-4.0.13 && cd -
 
 2/ Clone meta-openembedded git repository with the proper branch ready.  
+
     git clone git://git.openembedded.org/meta-openembedded && cd meta-openembedded && git checkout -b kirkstone 79a6f6 && cd -
 
 3/ Clone meta-atmel layer with the proper branch ready.  
+
     git clone https://github.com/linux4sam/meta-atmel.git -b kirkstone
 
 4/ Clone meta-arm layer with the proper branch ready
+
     git clone https://git.yoctoproject.org/meta-arm && cd meta-arm && git checkout -b kirkstone yocto-4.0.1 && cd -
 
 5/ Clone meta-thornxt layer with the proper branch ready.  
+
     git clone https://github.com/thorrockstar/meta-thornxt.git -b kirkstone
 
-6/ Enter the poky directory to configure the build system and start the build process.  
-   cd poky
+6/ Enter the poky directory to configure the build system and start the build process.
+
+    cd poky
 
 7/ Inside the .templateconf file, you will need to modify the TEMPLATECONF variable to match the path to the meta-atmel layer "conf" directory:
-   gedit .templateconf
 
-   export TEMPLATECONF=${TEMPLATECONF:-../meta-atmel/conf}
+    gedit .templateconf
+
+    export TEMPLATECONF=${TEMPLATECONF:-../meta-atmel/conf}
 
 8/ Initialize build directory and set compiler.  
+
     source oe-init-build-env build-microchip
 
 9/ Add meta-thornxt layer to bblayer configuration file.
@@ -82,28 +103,28 @@ Build procedure
 
     gedit conf/bblayers.conf
 
-    BBPATH = "${TOPDIR}"
-    BBFILES ?= ""
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
 
-    BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../../..')}"
+BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../../..')}"
 
-    BBLAYERS ?= " \
-      ${BSPDIR}/poky/meta \
-      ${BSPDIR}/poky/meta-poky \
-      ${BSPDIR}/poky/meta-yocto-bsp \
-      ${BSPDIR}/meta-openembedded/meta-oe \
-      ${BSPDIR}/meta-openembedded/meta-networking \
-      ${BSPDIR}/meta-openembedded/meta-python \
-      ${BSPDIR}/meta-atmel \
-      ${BSPDIR}/meta-thornxt \
-      ${BSPDIR}/meta-arm/meta-arm \
-      ${BSPDIR}/meta-arm/meta-arm-toolchain \
-      "
+BBLAYERS ?= " \
+  ${BSPDIR}/poky/meta \
+  ${BSPDIR}/poky/meta-poky \
+  ${BSPDIR}/poky/meta-yocto-bsp \
+  ${BSPDIR}/meta-openembedded/meta-oe \
+  ${BSPDIR}/meta-openembedded/meta-networking \
+  ${BSPDIR}/meta-openembedded/meta-python \
+  ${BSPDIR}/meta-atmel \
+  ${BSPDIR}/meta-thornxt \
+  ${BSPDIR}/meta-arm/meta-arm \
+  ${BSPDIR}/meta-arm/meta-arm-toolchain \
+  "
 
-    BLAYERS_NON_REMOVABLE ?= " \
-      ${BSPDIR}/poky/meta \
-      ${BSPDIR}/poky/meta-poky \
-      "
+BLAYERS_NON_REMOVABLE ?= " \
+  ${BSPDIR}/poky/meta \
+  ${BSPDIR}/poky/meta-poky \
+  "
 
 10/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
 Pick one MACHINE name from the "Supported SoCs / MACHINE names" chapter above
@@ -113,17 +134,24 @@ and edit the "local.conf" file. Here is an example:
 
     gedit conf/local.conf
 
-    [...]
-    MACHINE ??= "sama5d3-xplained"
-    [...]
-    PACKAGE_CLASSES ?= "package_ipk"
-    [...]
-    USER_CLASSES ?= "buildstats"
-    [...]
-    INIT_MANAGER = "sysvinit"
-    [...]
-    DISTRO ?= "poky-atmel"
-
+[...]  
+MACHINE ??= "sama5d3-xplained"  
+[...]  
+PACKAGE_CLASSES ?= "package_ipk"  
+[...]  
+USER_CLASSES ?= "buildstats"  
+[...]  
+INIT_MANAGER = "sysvinit"  
+[...]  
+DISTRO ?= "poky-atmel"  
+[...]  
+ENABLE_BINARY_LOCALE_GENERATION = "1"  
+[...]  
+GLIBC_SPLIT_LC_PACKAGES = "0"  
+[...]  
+GLIBC_GENERATE_LOCALES += "en_US.UTF-8"  
+[...]  
+IMAGE_LINGUAS += "en-us"  
 
 **IMPORTANT**
 
@@ -132,6 +160,7 @@ has been turned **off** as well as **'General Setup->Timers subsystem->Timer tic
 This should be done by the 'defconfig' but double check before building because it is cruicial.
 
 12/ Build Thor demo images  
+
     bitbake thor-nxt-image
 
 Typical bitbake output
