@@ -18,7 +18,7 @@
  #include <asm/arch/sama5d3_smc.h>
  #include <asm/arch/at91_common.h>
  #include <asm/arch/at91_rstc.h>
-@@ -15,11 +15,4810 @@
+@@ -15,11 +15,4829 @@
  #include <asm/arch/clk.h>
  #include <debug_uart.h>
  #include <spl.h>
@@ -412,6 +412,25 @@
 +        }
 +}
 +
++void *app_spi_do_alloc_slave(int offset, int size, unsigned int bus,
++			 unsigned int cs)
++{
++	u8 *ptr;
++
++	ptr = malloc(size);
++	if (ptr) {
++		struct spi_slave *slave;
++
++		memset(ptr, '\0', size);
++		slave = (struct spi_slave *)(ptr + offset);
++		slave->bus = bus;
++		slave->cs = cs;
++		slave->wordlen = SPI_DEFAULT_WORDLEN;
++	}
++
++	return ptr;
++}
++
 +static inline struct atmel_spi_slave *to_atmel_spi(struct spi_slave *slave)
 +{
 +	return container_of(slave, struct atmel_spi_slave, slave);
@@ -473,7 +492,7 @@
 +	if (mode & SPI_CPOL)
 +		csrx |= ATMEL_SPI_CSRx_CPOL;
 +
-+	as = spi_alloc_slave(struct atmel_spi_slave, bus, cs);
++	as = app_spi_do_alloc_slave(offsetof(struct atmel_spi_slave, slave), sizeof(struct atmel_spi_slave), bus, cs);
 +	if (!as)
 +		return NULL;
 +
@@ -4829,7 +4848,7 @@
  extern void at91_pda_detect(void);
  
  #ifdef CONFIG_NAND_ATMEL
-@@ -62,13 +4861,6 @@
+@@ -62,13 +4880,6 @@
  }
  #endif
  
@@ -4843,7 +4862,7 @@
  #ifdef CONFIG_DEBUG_UART_BOARD_INIT
  void board_debug_uart_init(void)
  {
-@@ -87,31 +4879,101 @@
+@@ -87,31 +4898,101 @@
  #ifdef CONFIG_BOARD_EARLY_INIT_F
  int board_early_init_f(void)
  {
@@ -4956,7 +4975,7 @@
  
  	return 0;
  }
-@@ -121,9 +4983,6 @@
+@@ -121,9 +5002,6 @@
  void spl_board_init(void)
  {
  #ifdef CONFIG_SD_BOOT
@@ -4966,7 +4985,7 @@
  #elif CONFIG_NAND_BOOT
  	sama5d3_xplained_nand_hw_init();
  #endif
-@@ -205,4 +5064,5 @@
+@@ -205,4 +5083,5 @@
  	      AT91_PMC_MCKR_CSS_PLLA;
  	at91_mck_init(tmp);
  }
