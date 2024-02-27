@@ -99,6 +99,7 @@ fix_usr_files () {
 fix_firmware_files () {
     rm -fr $D/usr/lib/firmware/*
     rm -fr $D/usr/share/sounds/alsa/*.wav
+    rm -fr $D/usr/share/alsa/ucm2
 }
 
 fix_interfaces_files () {
