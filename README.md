@@ -93,9 +93,9 @@ Build procedure
 
     export TEMPLATECONF=${TEMPLATECONF:-../meta-atmel/conf}
 
-8/ Initialize build directory and set compiler.  
+8/ Initialize build directory and set compiler. Mind the 'build-atmel' (Atmel) in the end of the command line.  
 
-    source oe-init-build-env build-microchip
+    source oe-init-build-env build-atmel
 
 9/ Add meta-thornxt layer to bblayer configuration file.
 
