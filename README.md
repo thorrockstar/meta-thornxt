@@ -93,7 +93,7 @@ Build procedure
 
     export TEMPLATECONF=${TEMPLATECONF:-../meta-atmel/conf}
 
-8/ Initialize build directory and set compiler.  
+8/ Initialize build directory and set compiler. Mind the 'build-microchip' (Microchip and **not** Atmel anymore) in the end of the command line.  
 
     source oe-init-build-env build-microchip
 
