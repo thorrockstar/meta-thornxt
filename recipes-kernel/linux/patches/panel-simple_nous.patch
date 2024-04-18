@@ -1,0 +1,70 @@
+--- a/drivers/gpu/drm/panel/panel-simple.c
++++ b/drivers/gpu/drm/panel/panel-simple.c
+@@ -709,6 +709,54 @@
+ 	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+ };
+ 
++static const struct drm_display_mode eastrising_ertft050_mode = {
++	.clock = 41677,
++	.hdisplay = 800,
++	.hsync_start = 800 + 46,
++	.hsync_end = 800 + 46 + 20,
++	.htotal = 800 + 46 + 20 + 190,
++	.vdisplay = 480,
++	.vsync_start = 480 + 23,
++	.vsync_end = 480 + 23 + 10,
++	.vtotal = 480 + 23 + 10 + 12,
++	.flags = DISPLAY_FLAGS_VSYNC_HIGH | DISPLAY_FLAGS_HSYNC_HIGH,
++};
++
++static const struct panel_desc eastrising_ertft050 = {
++	.modes = &eastrising_ertft050_mode,
++	.num_modes = 1,
++	.size = {
++		.width = 110,
++		.height = 78,
++	},
++	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
++	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_SAMPLE_POSEDGE,
++};
++
++static const struct drm_display_mode hifaycx_rd570_mode = {
++	.clock = 33333,
++	.hdisplay = 480,
++	.hsync_start = 480 + 30,
++	.hsync_end = 480 + 30 + 10,
++	.htotal = 480 + 30 + 10 + 30,
++	.vdisplay = 960,
++	.vsync_start = 960 + 16,
++	.vsync_end = 960 + 16 + 8,
++	.vtotal = 960 + 16 + 8 + 8,
++	.flags = DRM_MODE_FLAG_NVSYNC | DRM_MODE_FLAG_NHSYNC,
++};
++
++static const struct panel_desc hifaycx_rd570 = {
++	.modes = &hifaycx_rd570_mode,
++	.num_modes = 1,
++	.size = {
++		.width = 65,
++		.height = 125,
++	},
++	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
++	.bus_flags = DRM_BUS_FLAG_DE_HIGH | DRM_BUS_FLAG_PIXDATA_SAMPLE_POSEDGE,
++};
++
+ static const struct drm_display_mode ampire_am800480r3tmqwa1h_mode = {
+ 	.clock = 33333,
+ 	.hdisplay = 800,
+@@ -4305,6 +4353,12 @@
+		.compatible = "panel-dpi",
+		.data = &panel_dpi,
+	}, {
++		.compatible = "eastrising,ertft050",
++		.data = &eastrising_ertft050,
++	}, {
++		.compatible = "hifaycx,rd570",
++		.data = &hifaycx_rd570,
++	}, {
+ 		/* sentinel */
+ 	}
+ };
