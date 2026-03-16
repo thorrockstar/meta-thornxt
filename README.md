@@ -122,7 +122,7 @@ PACKAGE_CLASSES ?= "package_ipk"
 [...]
 USER_CLASSES ?= "buildstats image-mklibs"
 [...]
-DISTRO = "poky-atmel"
+DISTRO = "thor-atmel"
 
 **IMPORTANT**
 
@@ -141,7 +141,7 @@ Typical bitbake output
     NATIVELSBSTRING      = "universal"
     TARGET_SYS           = "arm-poky-linux-gnueabi"
     MACHINE              = "sama5d3-xplained"
-    DISTRO               = "poky-atmel"
+    DISTRO               = "thor-atmel"
     DISTRO_VERSION       = "3.1.13"
     TUNE_FEATURES        = "arm vfp cortexa5 thumb callconvention-hard"
     TARGET_FPU           = "hard"
