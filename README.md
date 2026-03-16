@@ -143,7 +143,7 @@ USER_CLASSES ?= "buildstats"
 [...]  
 INIT_MANAGER = "sysvinit"  
 [...]  
-DISTRO ?= "poky-atmel"  
+DISTRO ?= "thor-atmel"  
 [...]  
 ENABLE_BINARY_LOCALE_GENERATION = "1"  
 [...]  
@@ -171,7 +171,7 @@ Typical bitbake output
     NATIVELSBSTRING      = "universal"
     TARGET_SYS           = "arm-poky-linux-gnueabi"
     MACHINE              = "sama5d3-xplained"
-    DISTRO               = "poky-atmel"
+    DISTRO               = "thor-atmel"
     DISTRO_VERSION       = "4.0.13"
     TUNE_FEATURES        = "arm vfp cortexa5 thumb callconvention-hard"
     TARGET_FPU           = "hard"
