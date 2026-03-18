@@ -108,22 +108,22 @@ BBFILES ?= ""
 
 BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../../..')}"
 
-BBLAYERS ?= " \
-  ${BSPDIR}/poky/meta \
-  ${BSPDIR}/poky/meta-poky \
-  ${BSPDIR}/poky/meta-yocto-bsp \
-  ${BSPDIR}/meta-openembedded/meta-oe \
-  ${BSPDIR}/meta-openembedded/meta-networking \
-  ${BSPDIR}/meta-openembedded/meta-python \
-  ${BSPDIR}/meta-atmel \
-  ${BSPDIR}/meta-thornxt \
-  ${BSPDIR}/meta-arm/meta-arm \
-  ${BSPDIR}/meta-arm/meta-arm-toolchain \
+BBLAYERS ?= " \\  
+  ${BSPDIR}/poky/meta \\  
+  ${BSPDIR}/poky/meta-poky \\  
+  ${BSPDIR}/poky/meta-yocto-bsp \\  
+  ${BSPDIR}/meta-openembedded/meta-oe \\  
+  ${BSPDIR}/meta-openembedded/meta-networking \\  
+  ${BSPDIR}/meta-openembedded/meta-python \\  
+  ${BSPDIR}/meta-atmel \\  
+  ${BSPDIR}/meta-thornxt \\  
+  ${BSPDIR}/meta-arm/meta-arm \\  
+  ${BSPDIR}/meta-arm/meta-arm-toolchain \\  
   "
 
-BLAYERS_NON_REMOVABLE ?= " \
-  ${BSPDIR}/poky/meta \
-  ${BSPDIR}/poky/meta-poky \
+BLAYERS_NON_REMOVABLE ?= " \\  
+  ${BSPDIR}/poky/meta \\  
+  ${BSPDIR}/poky/meta-poky \\  
   "
 
 10/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
