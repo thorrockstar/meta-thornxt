@@ -99,7 +99,7 @@ Build procedure
 
 9/ Add meta-thornxt layer to bblayer configuration file.
 
-**Make sure that you have no white spaces left to "BBLAYERS ?=" and the other variables when editing the text block.**
+**When copying the text block, make sure that there are no white spaces left to "BBLAYERS ?=" and the other variables. Also, when copying the following text block directly from your text editor, make sure that there is only one backslash '\' at the end of each line, as the Markdown (.md) language requires two backslashes to show one.**
 
     gedit conf/bblayers.conf
 
@@ -134,23 +134,23 @@ and edit the "local.conf" file. Here is an example:
 
     gedit conf/local.conf
 
-[...]  
+  
 MACHINE ??= "sama5d3-xplained"  
-[...]  
+  
 PACKAGE_CLASSES ?= "package_ipk"  
-[...]  
+  
 USER_CLASSES ?= "buildstats"  
-[...]  
+  
 INIT_MANAGER = "sysvinit"  
-[...]  
+  
 DISTRO ?= "thor-atmel"  
-[...]  
+  
 ENABLE_BINARY_LOCALE_GENERATION = "1"  
-[...]  
+  
 GLIBC_SPLIT_LC_PACKAGES = "0"  
-[...]  
+  
 GLIBC_GENERATE_LOCALES += "en_US.UTF-8"  
-[...]  
+  
 IMAGE_LINGUAS += "en-us"  
 
 **IMPORTANT**
