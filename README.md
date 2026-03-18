@@ -99,7 +99,7 @@ Build procedure
 
 9/ Add meta-thornxt layer to bblayer configuration file.
 
-**Make sure that you have no white spaces left to "BBLAYERS ?=" and the other variables when editing the text block.**
+**When copying the text block, make sure that there are no white spaces left to "BBLAYERS ?=" and the other variables. Also, when copying the following text block directly from your text editor, make sure that there is only one backslash '\' at the end of each line, as the Markdown (.md) language requires two backslashes to show one.**
 
     gedit conf/bblayers.conf
 
@@ -108,22 +108,22 @@ BBFILES ?= ""
 
 BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../../..')}"
 
-BBLAYERS ?= " \
-  ${BSPDIR}/poky/meta \
-  ${BSPDIR}/poky/meta-poky \
-  ${BSPDIR}/poky/meta-yocto-bsp \
-  ${BSPDIR}/meta-openembedded/meta-oe \
-  ${BSPDIR}/meta-openembedded/meta-networking \
-  ${BSPDIR}/meta-openembedded/meta-python \
-  ${BSPDIR}/meta-atmel \
-  ${BSPDIR}/meta-thornxt \
-  ${BSPDIR}/meta-arm/meta-arm \
-  ${BSPDIR}/meta-arm/meta-arm-toolchain \
+BBLAYERS ?= " \\  
+  ${BSPDIR}/poky/meta \\  
+  ${BSPDIR}/poky/meta-poky \\  
+  ${BSPDIR}/poky/meta-yocto-bsp \\  
+  ${BSPDIR}/meta-openembedded/meta-oe \\  
+  ${BSPDIR}/meta-openembedded/meta-networking \\  
+  ${BSPDIR}/meta-openembedded/meta-python \\  
+  ${BSPDIR}/meta-atmel \\  
+  ${BSPDIR}/meta-thornxt \\  
+  ${BSPDIR}/meta-arm/meta-arm \\  
+  ${BSPDIR}/meta-arm/meta-arm-toolchain \\  
   "
 
-BLAYERS_NON_REMOVABLE ?= " \
-  ${BSPDIR}/poky/meta \
-  ${BSPDIR}/poky/meta-poky \
+BLAYERS_NON_REMOVABLE ?= " \\  
+  ${BSPDIR}/poky/meta \\  
+  ${BSPDIR}/poky/meta-poky \\  
   "
 
 10/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
@@ -134,24 +134,24 @@ and edit the "local.conf" file. Here is an example:
 
     gedit conf/local.conf
 
-[...]  
+  
 MACHINE ??= "sama5d3-xplained"  
-[...]  
+  
 PACKAGE_CLASSES ?= "package_ipk"  
-[...]  
+  
 USER_CLASSES ?= "buildstats"  
-[...]  
+  
 INIT_MANAGER = "sysvinit"  
-[...]  
+  
 DISTRO ?= "thor-atmel"  
-[...]  
+  
 ENABLE_BINARY_LOCALE_GENERATION = "1"  
-[...]  
+  
 GLIBC_SPLIT_LC_PACKAGES = "0"  
-[...]  
-GLIBC_GENERATE_LOCALES = ""  
-[...]  
-IMAGE_LINGUAS = ""  
+  
+GLIBC_GENERATE_LOCALES += "en_US.UTF-8"  
+  
+IMAGE_LINGUAS += "en-us"  
 
 **IMPORTANT**
 
