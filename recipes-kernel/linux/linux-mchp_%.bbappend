@@ -8,9 +8,8 @@ SRC_URI += " \
 	file://Makefile.patch;patch=1 \
 	file://panel-simple.patch;patch=1 \
 	file://at91_can.patch;patch=1 \
-	file://at91-sama5d3_thor-nxt2.dts;subdir=git/arch/${ARCH}/boot/dts \
-	file://at91-sama5d3_thor-nxt3.dts;subdir=git/arch/${ARCH}/boot/dts \
-	file://at_hdmac.patch;patch=1 \
+	file://at91-sama5d3_thor-nxt2.dts;subdir=git/arch/${ARCH}/boot/dts/microchip \
+	file://at91-sama5d3_thor-nxt3.dts;subdir=git/arch/${ARCH}/boot/dts/microchip \
 "
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

@@ -1,18 +1,18 @@
 --- a/drivers/spi/spidev.c
 +++ b/drivers/spi/spidev.c
-@@ -700,6 +700,7 @@
+@@ -712,6 +712,7 @@
  	{ .name = "m53cpld" },
  	{ .name = "spi-petra" },
  	{ .name = "spi-authenta" },
-+	{ .name = "spidev" },
++	{ .name = "spidev" },	
+ 	{ .name = "em3581" },
+ 	{ .name = "si3210" },
  	{},
- };
- MODULE_DEVICE_TABLE(spi, spidev_spi_ids);
-@@ -721,6 +722,7 @@
+@@ -740,6 +741,7 @@
+ 	{ .compatible = "micron,spi-authenta", .data = &spidev_of_check },
  	{ .compatible = "rohm,dh2228fv", .data = &spidev_of_check },
- 	{ .compatible = "lineartechnology,ltc2488", .data = &spidev_of_check },
  	{ .compatible = "semtech,sx1301", .data = &spidev_of_check },
 +	{ .compatible = "linux,spidev", .data = &spidev_of_check },
- 	{ .compatible = "lwn,bk4", .data = &spidev_of_check },
- 	{ .compatible = "dh,dhcom-board", .data = &spidev_of_check },
- 	{ .compatible = "menlo,m53cpld", .data = &spidev_of_check },
+ 	{ .compatible = "silabs,em3581", .data = &spidev_of_check },
+ 	{ .compatible = "silabs,si3210", .data = &spidev_of_check },
+ 	{},
