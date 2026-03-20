@@ -20,6 +20,10 @@ KERNEL_DEVICETREE += "at91-sama5d3_thor-nxt2.dtb"
 KERNEL_DEVICETREE += "at91-sama5d3_thor-nxt3.dtb"
 
 do_configure:prepend() {
-    mv ${WORKDIR}/defconfig_thor ${WORKDIR}/defconfig
     cp ${WORKDIR}/defconfig ${WORKDIR}/build/.config
 }
+
+do_configure:append() {
+    cp ${WORKDIR}/defconfig ${WORKDIR}/build/.config
+}
+
