@@ -86,26 +86,32 @@ Build procedure
 
 gedit conf/bblayers.conf
 
+```
+# POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
+# changes incompatibly
+POKY_BBLAYERS_CONF_VERSION = "2"
+
 BBPATH = "${TOPDIR}"
 BBFILES ?= ""
 
 BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../../..')}"
 
-BBLAYERS ?= " \\  
-  ${BSPDIR}/poky/meta \\  
-  ${BSPDIR}/poky/meta-poky \\  
-  ${BSPDIR}/poky/meta-yocto-bsp \\  
-  ${BSPDIR}/meta-atmel \\  
-  ${BSPDIR}/meta-thornxt \\  
-  ${BSPDIR}/meta-openembedded/meta-oe \\  
-  ${BSPDIR}/meta-openembedded/meta-networking \\  
-  ${BSPDIR}/meta-openembedded/meta-python \\  
+BBLAYERS ?= " \
+  ${BSPDIR}/poky/meta \
+  ${BSPDIR}/poky/meta-poky \
+  ${BSPDIR}/poky/meta-yocto-bsp \
+  ${BSPDIR}/meta-atmel \
+  ${BSPDIR}/meta-thornxt \
+  ${BSPDIR}/meta-openembedded/meta-oe \
+  ${BSPDIR}/meta-openembedded/meta-networking \
+  ${BSPDIR}/meta-openembedded/meta-python \
   "
 
-BLAYERS_NON_REMOVABLE ?= " \\  
-  ${BSPDIR}/poky/meta \\  
-  ${BSPDIR}/poky/meta-poky \\  
+BLAYERS_NON_REMOVABLE ?= " \
+  ${BSPDIR}/poky/meta \
+  ${BSPDIR}/poky/meta-poky \
   "
+```
 
 8/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
 Pick one MACHINE name from the "Supported SoCs / MACHINE names" chapter above
