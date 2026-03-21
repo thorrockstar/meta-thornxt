@@ -251,7 +251,7 @@
 				};
 			};
 			
-			pmc: pmc@fffffc00 {
+			pmc: clock-controller@fffffc00 {
 				main: mainck {
 					clock-frequency = <12000000>;
 				};
