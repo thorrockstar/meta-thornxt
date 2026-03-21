@@ -99,7 +99,7 @@ Build procedure
 
 9/ Add meta-thornxt layer to bblayer configuration file.
 
-    gedit conf/bblayers.conf
+    gnome-text-editor conf/bblayers.conf
 
 ```
 # POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
@@ -135,9 +135,9 @@ and edit the "local.conf" file. Here is an example:
 
 **Make sure that you have no white spaces left to "MACHINE ??=" and the other variables when editing the text block.**
 
-    gedit conf/local.conf
+    gnome-text-editor conf/local.conf
 
-
+```
 MACHINE ??= "sama5d3-xplained"  
 
 PACKAGE_CLASSES ?= "package_ipk"  
@@ -155,6 +155,7 @@ GLIBC_SPLIT_LC_PACKAGES = "0"
 GLIBC_GENERATE_LOCALES += "en_US.UTF-8"  
 
 IMAGE_LINGUAS += "en-us"  
+```
 
 **IMPORTANT**
 
