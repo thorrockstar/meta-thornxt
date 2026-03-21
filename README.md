@@ -65,11 +65,11 @@ Build procedure
 
 1/ Clone yocto/poky git repository with the proper branch ready.  
 
-    git clone https://git.yoctoproject.org/poky && cd poky && git checkout -b kirkstone yocto-4.0.13 && cd -
+    git clone https://git.yoctoproject.org/poky -b kirkstone
 
 2/ Clone meta-openembedded git repository with the proper branch ready.  
 
-    git clone git://git.openembedded.org/meta-openembedded && cd meta-openembedded && git checkout -b kirkstone 79a6f6 && cd -
+    git clone git://git.openembedded.org/meta-openembedded -b kirkstone
 
 3/ Clone meta-atmel layer with the proper branch ready.  
 
@@ -77,7 +77,7 @@ Build procedure
 
 4/ Clone meta-arm layer with the proper branch ready
 
-    git clone https://git.yoctoproject.org/meta-arm && cd meta-arm && git checkout -b kirkstone yocto-4.0.1 && cd -
+    git clone https://git.yoctoproject.org/meta-arm -b kirkstone
 
 5/ Clone meta-thornxt layer with the proper branch ready.  
 
@@ -93,39 +93,42 @@ Build procedure
 
     export TEMPLATECONF=${TEMPLATECONF:-../meta-atmel/conf}
 
-8/ Initialize build directory and set compiler.  
+8/ Initialize build directory and set compiler. Mind the 'build-microchip' (Microchip and **not** Atmel anymore) in the end of the command line.  
 
     source oe-init-build-env build-microchip
 
 9/ Add meta-thornxt layer to bblayer configuration file.
 
-**When copying the text block, make sure that there are no white spaces left to "BBLAYERS ?=" and the other variables. Also, when copying the following text block directly from your text editor, make sure that there is only one backslash '\' at the end of each line, as the Markdown (.md) language requires two backslashes to show one.**
-
     gedit conf/bblayers.conf
+
+```
+# POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
+# changes incompatibly
+POKY_BBLAYERS_CONF_VERSION = "2"
 
 BBPATH = "${TOPDIR}"
 BBFILES ?= ""
 
 BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../../..')}"
 
-BBLAYERS ?= " \\  
-  ${BSPDIR}/poky/meta \\  
-  ${BSPDIR}/poky/meta-poky \\  
-  ${BSPDIR}/poky/meta-yocto-bsp \\  
-  ${BSPDIR}/meta-openembedded/meta-oe \\  
-  ${BSPDIR}/meta-openembedded/meta-networking \\  
-  ${BSPDIR}/meta-openembedded/meta-python \\  
-  ${BSPDIR}/meta-atmel \\  
-  ${BSPDIR}/meta-thornxt \\  
-  ${BSPDIR}/meta-arm/meta-arm \\  
-  ${BSPDIR}/meta-arm/meta-arm-toolchain \\  
+BBLAYERS ?= " \
+  ${BSPDIR}/poky/meta \
+  ${BSPDIR}/poky/meta-poky \
+  ${BSPDIR}/poky/meta-yocto-bsp \
+  ${BSPDIR}/meta-openembedded/meta-oe \
+  ${BSPDIR}/meta-openembedded/meta-networking \
+  ${BSPDIR}/meta-openembedded/meta-python \
+  ${BSPDIR}/meta-atmel \
+  ${BSPDIR}/meta-thornxt \
+  ${BSPDIR}/meta-arm/meta-arm \
+  ${BSPDIR}/meta-arm/meta-arm-toolchain \
   "
 
-BLAYERS_NON_REMOVABLE ?= " \\  
-  ${BSPDIR}/poky/meta \\  
-  ${BSPDIR}/poky/meta-poky \\  
+BLAYERS_NON_REMOVABLE ?= " \
+  ${BSPDIR}/poky/meta \
+  ${BSPDIR}/poky/meta-poky \
   "
-
+```
 10/ Edit local.conf to specify the machine, location of source archived, package type (rpm, deb or ipk)
 Pick one MACHINE name from the "Supported SoCs / MACHINE names" chapter above
 and edit the "local.conf" file. Here is an example:  
@@ -134,23 +137,23 @@ and edit the "local.conf" file. Here is an example:
 
     gedit conf/local.conf
 
-  
+
 MACHINE ??= "sama5d3-xplained"  
-  
+
 PACKAGE_CLASSES ?= "package_ipk"  
-  
+
 USER_CLASSES ?= "buildstats"  
-  
+
 INIT_MANAGER = "sysvinit"  
-  
+
 DISTRO ?= "thor-atmel"  
-  
+
 ENABLE_BINARY_LOCALE_GENERATION = "1"  
-  
+
 GLIBC_SPLIT_LC_PACKAGES = "0"  
-  
+
 GLIBC_GENERATE_LOCALES += "en_US.UTF-8"  
-  
+
 IMAGE_LINGUAS += "en-us"  
 
 **IMPORTANT**
