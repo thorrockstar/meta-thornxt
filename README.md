@@ -1,4 +1,4 @@
-This layer provides support for the Thor-NXT platform reference boards
+µThis layer provides support for the Thor-NXT platform reference boards
 ======================================================================
 
 For more information about the Thor-NXT product line see:
@@ -58,32 +58,38 @@ Build has been tested under Ubuntu 22.04 LTS. Anyway you need to install these r
 Build procedure
 ===============
 
-0/ Create a directory.  
+0/ Create a directory.
+
     mkdir dunfell_sama
     cd dunfell_sama
 
 1/ Clone yocto/poky git repository with the proper branch ready.  
+
     git clone git://git.yoctoproject.org/poky -b dunfell
 
 2/ Clone meta-openembedded git repository with the proper branch ready.  
+
     git clone git://git.openembedded.org/meta-openembedded -b dunfell
 
 3/ Clone meta-atmel layer with the proper branch ready.  
+
     git clone https://github.com/linux4sam/meta-atmel.git -b dunfell
 
 4/ Clone meta-thornxt layer with the proper branch ready.  
+
     git clone https://github.com/thorrockstar/meta-thornxt.git -b dunfell
 
 5/ Enter the poky directory to configure the build system and start the build process.  
-   cd poky
 
-6/ Initialize build directory and set compiler. Mind the 'build-atmel' in the end of the command line.  
+    cd poky
+
+6/ Initialize build directory and set compiler. Mind the 'build-atmel' in the end of the command line.
+
     source oe-init-build-env build-atmel
 
 7/ Add meta-thornxt layer to bblayer configuration file.
 
-
-    gedit conf/bblayers.conf
+    gnome-text-editor conf/bblayers.conf
 
 
 ```
@@ -119,9 +125,9 @@ and edit the "local.conf" file. Here is an example:
 
 **Make sure that you have no white spaces left to "MACHINE ??=" and the other variables when editing the text block.**
 
-gedit conf/local.conf
+    gnome-text-editor conf/local.conf
 
-
+```
 MACHINE ??= "sama5d3-xplained"
 
 PACKAGE_CLASSES ?= "package_ipk"
@@ -130,6 +136,8 @@ USER_CLASSES ?= "buildstats image-mklibs"
 
 DISTRO = "thor-atmel"
 
+```
+
 **IMPORTANT**
 
 9/ Double check that in the kernel configuration **'General Setup->Timers subsystem->High Resolution Timer Support'**
@@ -137,6 +145,7 @@ has been turned **off** as well as **'General Setup->Timers subsystem->Timer tic
 This should be done by the 'defconfig' but double check before building because it is cruicial.
 
 10/ Build Thor demo images  
+
     bitbake thor-nxt-image
 
 Typical bitbake output
