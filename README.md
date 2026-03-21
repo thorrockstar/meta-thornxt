@@ -83,7 +83,7 @@ Build procedure
 7/ Add meta-thornxt layer to bblayer configuration file.
 
 
-gedit conf/bblayers.conf
+    gedit conf/bblayers.conf
 
 
 ```
