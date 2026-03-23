@@ -173,7 +173,7 @@ Typical bitbake output
     BB_VERSION           = "2.0.0"
     BUILD_SYS            = "x86_64-linux"
     NATIVELSBSTRING      = "universal"
-    TARGET_SYS           = "arm-poky-linux-gnueabi"
+    TARGET_SYS           = "arm-thor-linux-gnueabi"
     MACHINE              = "sama5d3-xplained"
     DISTRO               = "thor-atmel"
     DISTRO_VERSION       = "4.0.13"
@@ -181,14 +181,14 @@ Typical bitbake output
     TARGET_FPU           = "hard"
     meta                 
     meta-poky            
-    meta-yocto-bsp       = "kirkstone:e51bf557f596c4da38789a948a3228ba11455e3c"
+    meta-yocto-bsp       = "kirkstone:02c15addea7c3303552df5994ce0616b2059388c"
     meta-oe              
     meta-networking      
-    meta-python          = "kirkstone:79a6f60dabad9e5b0e041efa91379447ef030482"
-    meta-atmel           = "kirkstone:128bf04cb75902e239a145f0e84f6147aef2ff4b"
-    meta-thornxt         = "kirkstone:96c8dcd70f12b45a8b8f6071b440e09d65fd8c06"
+    meta-python          = "kirkstone:8a598a2bc9199a4fbb9008a32ab143fb509a0933"
+    meta-atmel           = "kirkstone:8c0d39c31ca47a677e8bcfe88045ab81fb7f20da"
+    meta-thornxt         = "kirkstone:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     meta-arm             
-    meta-arm-toolchain   = "kirkstone:bafd1d013c2470bcec123ba4eb8232ab879b2660"
+    meta-arm-toolchain   = "kirkstone:c3e9fb12aa31d25e33d8392c4a233ed1275a3278"
 
 Contributing
 ============
