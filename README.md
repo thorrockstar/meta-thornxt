@@ -43,8 +43,8 @@ URI: git://github.com/meta-qt5/meta-qt5.git
 URI: https://github.com/meta-qt5/meta-qt5
 
 
-Requisities
-===========
+Requisites
+==========
 
 Build has been tested under Ubuntu 22.04 LTS. Anyway you need to install these required packages:
 
