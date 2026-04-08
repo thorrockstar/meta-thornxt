@@ -69,7 +69,7 @@ Build procedure
 
 2/ Clone meta-openembedded git repository with the proper branch ready.  
 
-    git clone git://git.openembedded.org/meta-openembedded -b kirkstone
+    git clone https://git.openembedded.org/meta-openembedded -b kirkstone
 
 3/ Clone meta-atmel layer with the proper branch ready.  
 
